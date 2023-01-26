@@ -1,14 +1,26 @@
-export default function RootLayout({
+import "../styles/globals.css";
+
+import Providers from "./provider";
+import { SessionProvider } from "next-auth/react";
+import { authOptions } from "pages/api/auth/[...nextauth]";
+import { unstable_getServerSession } from "next-auth/next";
+
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  //@ts-ignore
+  const session = await unstable_getServerSession(authOptions);
+  // console.log(session);
+ 
+
   return (
     <html>
       <head />
       <body>
-        asdasds
-        {children}</body>
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }

@@ -3,6 +3,8 @@ export default function TestLayout({
 }: {
   children: React.ReactNode;
 }) {
+    console.log('test');
+    
   return (
     <div>
       this is Test Layout

@@ -3,7 +3,7 @@ import NextAuth from 'next-auth';
 import axios from 'axios';
 import { signInStrapi } from '@/utis/apiFn';
 
-export default NextAuth({
+export const authOptions = {
     providers: [
         CredentialsProvider({
             type: 'credentials',
@@ -21,7 +21,7 @@ export default NextAuth({
                 if (res.data.user) {
                     const user = { id: res.data.user.id, name: res.data.user.username, email: res.data.user.email, jwt: res.data.jwt }
                     return user
-       
+
                 } else {
                     // If you return null then an error will be displayed advising the user to check their details.
                     return null
@@ -73,5 +73,5 @@ export default NextAuth({
         },
     }, secret: process.env.NEXTAUTH_SECRET,
 
-
-});
+}
+export default NextAuth(authOptions);
