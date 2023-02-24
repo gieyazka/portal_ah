@@ -17,9 +17,9 @@ export const authOptions = {
                 if (credentials == null) return null;
                 const res = await signInStrapi(credentials.username, credentials.password)
                 // Add logic here to look up the user from the credentials supplied
-                // console.log(res.data);
+                console.log(res.data);
                 if (res.data.user) {
-                    const user = { id: res.data.user.id, name: res.data.user.username, email: res.data.user.email, jwt: res.data.jwt }
+                    const user = { id: res.data.user.id, name: res.data.user.username, email: res.data.user.email, jwt: res.data.jwt, rule: 'testRule' }
                     return user
 
                 } else {
@@ -58,16 +58,20 @@ export const authOptions = {
             return url
         },
         session: async ({ session, token }) => {
-
+//add custom agr here
             session.id = token.id;
             session.jwt = token.jwt;
+            session.rule = token.rule;
             return Promise.resolve(session);
         },
         jwt: async ({ token, user, profile }) => {
+
             const isSignIn = user ? true : false;
             if (isSignIn) {
                 token.id = user.id;
                 token.jwt = user.jwt;
+                token.rule = user.rule
+                //custom agr add here then ass in session
             }
             return Promise.resolve(token);
         },

@@ -22,13 +22,17 @@ export default function SignIn({}) {
   const router = useRouter();
   // const providers = use(getProviders());
 
-  const { data, error, isLoading } = useSWR('/api/auth/providers', fetcher)
+  // const { data, error, isLoading } = useSWR('/api/auth/providers', fetcher)
   
-  if (error) return <div>failed to load</div>
-  if (isLoading) return <div>loading...</div>
-  
+  // if (error) return <div>failed to load</div>
+  // if (isLoading) return <div>loading...</div>
+  // {
+  //   console.log(data.credentials.id);
+    
+  // }
   const onLogin = async (username: string, password: string) => {
-    let response = await signIn(data.credentials.id, {
+    let response = await signIn('credentials', {
+    // let response = await signIn(data.credentials.id, {
       username,
       password,
       redirect: false,

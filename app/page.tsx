@@ -1,13 +1,12 @@
-import SeverSes from "./sesverSession";
+import SeverSes from "./menu/sesverSession";
 import UserData from "./userData";
 
 export default function HomePage() {
   return (
     <div>
-      <UserData>
-        {/* @ts-expect-error Server Component */}
-        <SeverSes />
-      </UserData>
+      {/* <UserData> */}
+        {/* <SeverSes />
+      </UserData> */}
     </div>
   );
 }
