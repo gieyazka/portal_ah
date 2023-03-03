@@ -5,8 +5,7 @@ import SeverSes from "./sesverSession";
 export default function HomePage() {
   return (
     <div>
-      {/* @ts-expect-error Server Component */}
-      <SeverSes />
+   
     </div>
   );
 }

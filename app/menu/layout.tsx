@@ -1,10 +1,18 @@
 "use client";
 
 import { AiOutlineMenuFold, AiOutlineMenuUnfold } from "react-icons/ai";
+import { signIn, signOut, useSession } from "next-auth/react";
 
+import Link from "next/link";
 import Menu from "./menuItem";
+import { Session } from "next-auth/core/types";
+import SeverSession from "./sesverSession";
 import { authOptions } from "pages/api/auth/[...nextauth]";
+import axios from "axios";
+import { useRouter } from "next/router";
+import useSWR from "swr";
 import { useState } from "react";
+import { useUser } from "@/utis/apiFn";
 
 export default function RootLayout({
   children,
@@ -19,6 +27,9 @@ export default function RootLayout({
   const sibebarClose = {
     width: "96px",
   };
+  
+  const user = useUser()
+  
   return (
     <html>
       <head />
@@ -60,13 +71,26 @@ export default function RootLayout({
               </div>
 
               <h3 className=" font-semibold text-white mt-12">
-                {Menu.map((menu) => {
-                  return <div key={menu.name}>{menu.name}</div>;
-                })}
+                <div className="flex flex-col">
+                  {Menu.map((menu) => {
+                    return (
+                      <Link key={menu.name} href={`/menu/${menu.url}`}>
+                        {menu.name}
+                      </Link>
+                    );
+                  })}
+                </div>
               </h3>
             </div>
             <div className="flex flex-col flex-1">
-              <div className="bg-red-500 h-16 ">asdsajdgash</div>
+              <div className="bg-red-500 h-16 flex items-center">
+                {user.data ? (
+                  <div className="mx-4">{user.data.user.rule}</div>
+                ) : (
+                  <div className="mx-4">loading</div>
+                )}
+              </div>
+         
               <div
                 className={`overflow-auto   h-[calc(100vh_-_4rem)] transition-width bg-red-200`}
                 style={{

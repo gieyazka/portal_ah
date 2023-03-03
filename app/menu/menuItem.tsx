@@ -1,15 +1,26 @@
 const data = [
   {
-    name: "test",
+    name: "My Tasks",
+    url: "my_task",
+    subMenu: [
+      {
+        name: "In process",
+      },
+      {
+        name: "Reject",
+      },
+      {
+        name: "Completed",
+      },
+    ],
   },
   {
-    name: "test1",
+    name: "My action",
+    url: "/",
   },
   {
-    name: "test2",
-  },
-  {
-    name: "test3",
+    name: "Form Requisition",
+    url: "form_requisition",
   },
 ];
 

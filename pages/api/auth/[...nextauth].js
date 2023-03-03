@@ -17,7 +17,6 @@ export const authOptions = {
                 if (credentials == null) return null;
                 const res = await signInStrapi(credentials.username, credentials.password)
                 // Add logic here to look up the user from the credentials supplied
-                console.log(res.data);
                 if (res.data.user) {
                     const user = { id: res.data.user.id, name: res.data.user.username, email: res.data.user.email, jwt: res.data.jwt, rule: 'testRule' }
                     return user
@@ -51,18 +50,12 @@ export const authOptions = {
         // },
         async redirect({ url, baseUrl }) {
             // console.log('callback', url, baseUrl);
+          
             // Allows relative callback URLs
             if (url.startsWith("/")) return `${baseUrl}${url}`
             // // Allows callback URLs on the same origin
             else if (new URL(url).origin === baseUrl) return url
             return url
-        },
-        session: async ({ session, token }) => {
-//add custom agr here
-            session.id = token.id;
-            session.jwt = token.jwt;
-            session.rule = token.rule;
-            return Promise.resolve(session);
         },
         jwt: async ({ token, user, profile }) => {
 
@@ -74,6 +67,13 @@ export const authOptions = {
                 //custom agr add here then ass in session
             }
             return Promise.resolve(token);
+        },
+        session: async ({ session, token }) => {
+            //add custom agr here
+            session.user.id = token.id;
+            session.user.jwt = token.jwt;
+            session.user.rule = token.rule
+            return Promise.resolve(session);
         },
     }, secret: process.env.NEXTAUTH_SECRET,
 
