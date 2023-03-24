@@ -39,7 +39,7 @@
     "pages/api/auth/[...nextauth].ts",
     "pages/api/auth/[...nextauth].ts",
     ".next/types/**/*.ts"
-, "app/page.ts", "app/login/page.jsx"  ],
+, "app/page.ts", "app/login/page.jsx", "app/menu/my_task/page.tsx", "app/menu/my_action/page.tsx"  ],
   "exclude": [
     "node_modules"
   ]

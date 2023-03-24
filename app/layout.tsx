@@ -12,11 +12,14 @@ export default async function RootLayout({
 }) {
   //@ts-ignore
   // const session = await unstable_getServerSession(authOptions);
-// console.log(Providers);
+  // console.log(Providers);
 
   return (
-        <Providers>
-          {children}
-        </Providers>
-  );
+    <html>
+      <head></head>
+      <body>
+          <Providers>{children}</Providers>
+      </body>
+    </html>
+  )
 }

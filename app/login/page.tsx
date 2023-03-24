@@ -35,15 +35,12 @@ export default function SignIn({}) {
       username,
       password,
       redirect: false,
-      callbackUrl: "/menu",
+      callbackUrl: "/menu/my_task?current=in_process",
     })
       .then((error) => error)
       .catch((error) => error);
     console.log(response);
     if (response.status === 200) {
-      ("use client");
-      console.log(response.url);
-
       router.push(response.url);
     }
     // await signInStrapi(username, password);

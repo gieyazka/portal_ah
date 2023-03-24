@@ -8,7 +8,11 @@ export default withAuth(
         // console.log('6', req.nextUrl.pathname)
         if (req.nextUrl.pathname === "/") {
 
-            return NextResponse.redirect(new URL('/menu', req.url))
+            return NextResponse.redirect(new URL('/menu/my_task?current=in_process', req.url))
+        }
+        if (req.nextUrl.pathname === "/menu") {
+
+            return NextResponse.redirect(new URL('/menu/my_task?current=in_process', req.url))
         }
     },
     {
@@ -16,7 +20,8 @@ export default withAuth(
             authorized: (req) => {
                 const { token } = req
                 const pathName = req.req.nextUrl.pathname
-                if (!token) {
+                const checkPathname = pathName.startsWith('/menu')
+                if (!token && checkPathname) {
                     return false
                 }
                 return true
