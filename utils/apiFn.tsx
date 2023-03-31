@@ -1,6 +1,6 @@
+import dayjs,{ Dayjs } from "dayjs";
 import useSWR, { useSWRConfig } from "swr";
 
-import { Dayjs } from "dayjs";
 import axios from "axios";
 import useSWRImmutable from "swr/immutable";
 import { userData } from "@/types/next-auth";
@@ -59,9 +59,8 @@ const useMyTask = (data: {
 
 const usePosition = () => {
   const myTask = useSWR(
-   
-      `${process.env.NEXT_PUBLIC_Strapi}/api/levels`,
-     
+    `${process.env.NEXT_PUBLIC_Strapi}/api/levels`,
+
     (url) => fetcher(url),
     {
       refreshInterval: 300000,

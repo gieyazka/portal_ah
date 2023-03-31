@@ -6,14 +6,13 @@ import { task } from "@/types/next-auth";
 
 const Leave_Flow = (props: { task: task }) => {
   const task = props.task;
-  console.log(task);
   // console.log(dayjs().startOf('day').toISOString());
 
   return (
     <div>
       <ApproverStep task={task} />
+      <Requester requester={task?.data.requester} />
       <LeaveDetail task={task} />
-      <Requester requester={task.data.requester} />
       <Action_log approverList={task.data.approverList} />
     </div>
   );

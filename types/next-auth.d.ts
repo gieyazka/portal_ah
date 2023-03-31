@@ -15,7 +15,8 @@ declare module "next-auth" {
       department?: string
       company?: string
       level?: string
-      secion?: string
+      section?: string
+      sub_section?: string | undefined
       priority?: string
     } & DefaultSession["user"]
   }
@@ -84,9 +85,27 @@ type approver = {
   sub_section: string | undefined
 }
 
+type previewStore = {
+  open: boolean;
+  file: string | undefined;
+  type: string | undefined;
+  onShowBackDrop: (file: Blob, type: string) => void;
+  onHideBackDrop: () => void;
+}
+
+type filterStore = {
+  startDate: Dayjs;
+  endDate: Dayjs;
+  isFetch: boolean;
+  filterStr: string | undefined;
+  handleChangeStartDate: (newDate: Dayjs) => void;
+  handleChangeEndDate: (newDate: Dayjs) => void;
+  handleChangeFilterStr: (str: string | undefined) => void;
+  searchClick: () => void;
+}
 
 type requester = {
-  company?: string, name?: string, department?: string, section?: string, empid?: string
+  company?: string, name?: string, department?: string, section?: string, empid?: string, position?: string
 }
 
 type approverList = {
@@ -103,4 +122,18 @@ type approverList = {
   sub_section: string | undefined
   note: string | undefined
   action: string | undefined
+}
+
+type DialogStore = {
+  open: boolean;
+  task: task | undefined
+  type?: string | undefined,
+  onOpenDialog: (task: any, type?: string | undefined) => void;
+  onCloseDialog: () => void;
+}
+
+type fileData = {
+  type: string
+  name: string
+  file: Blob
 }

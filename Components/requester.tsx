@@ -19,6 +19,9 @@ const Requester = (props: { requester: requester }) => {
             <p>
               <b>Employee ID :</b> {requester.empid}
             </p>
+            <p>
+              <b>Position :</b> {requester.position}
+            </p>
           </div>
           <div className="flex flex-col ">
             <p>

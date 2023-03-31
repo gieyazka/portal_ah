@@ -12,6 +12,8 @@ import {
   ListSubheader,
   MenuItem,
   Tooltip,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import {
   Drafts,
@@ -22,17 +24,20 @@ import {
   Send,
   StarBorder,
 } from "@mui/icons-material";
+import React, { useEffect } from "react";
 import { menuItem, subMenu } from "@/types/next-auth";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import Link from "next/link";
 import Menu from "./menuItem";
-import React from "react";
+import Preview_Backdrop from "@/Components/preview_backdrop";
+import RenderDialog from "@/Components/Dialog";
 import { Session } from "next-auth/core/types";
-import SeverSession from "./sesverSession";
 import { authOptions } from "pages/api/auth/[...nextauth]";
 import axios from "axios";
+import fn from "@/utils/common";
+import { useDialogStore } from "../../store/store";
 import useSWR from "swr";
 import { useState } from "react";
 import { useUser } from "@/utils/apiFn";
@@ -42,6 +47,9 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  console.log("layout run");
+  const user = useUser();
+
   const pathName = usePathname();
   const splitPath = pathName ? pathName.split("/") : [];
   const lastPath = splitPath[splitPath.length - 1];
@@ -49,28 +57,13 @@ export default function RootLayout({
   const sidebarOpen = {
     width: "208px",
   };
-  const handleResize = () => {
-    setIslg(window.innerWidth >= 1024);
-  };
-  const [isLg, setIslg] = useState(true);
-  React.useEffect(() => {
-    handleResize();
-    window.addEventListener("resize", () => {
-      handleResize;
-    });
-    // unsubscribe from the event on component unmount
-    return () =>
-      window.removeEventListener("resize", () => {
-        handleResize;
-      });
-  }, []);
-
+  const theme = useTheme();
+  const isLg = useMediaQuery(theme.breakpoints.up("lg"));
   const sidebarClose = {
     width: isLg ? "64px" : "0px",
   };
   const router = useRouter();
   const searchParams = useSearchParams();
-  const user = useUser();
   const [open, setOpen] = React.useState(
     Menu.map((d) => {
       return { open: false };
@@ -84,12 +77,11 @@ export default function RootLayout({
       return newState;
     });
   };
-
   return (
     <div className="max-w-screen overflow-hidden">
       <div className="flex relative">
         <div
-          className={`bg-red-500 absolute h-screen  text-center  text-white z-39  ease-in-out transition-width 
+          className={`bg-red-500 absolute h-screen  text-center  text-white z-19  ease-in-out transition-width 
             `}
           style={{
             width: showSidebar ? sidebarOpen.width : sidebarClose.width,
@@ -135,7 +127,7 @@ export default function RootLayout({
                 },
               }}
             >
-              <span className="flex flex-col">
+              <div className="flex flex-col">
                 {Menu.map((menu, index) => {
                   // console.log(menu);
                   if (!showSidebar && !isLg) {
@@ -208,7 +200,7 @@ export default function RootLayout({
                     </div>
                   );
                 })}
-              </span>
+              </div>
             </List>
           </h3>
         </div>
@@ -244,13 +236,15 @@ export default function RootLayout({
               <Backdrop
                 sx={{
                   color: "#fff",
-                  zIndex: 40,
+                  zIndex: 20,
                 }}
                 open={showSidebar}
                 onClick={() => setShowSidebar(!showSidebar)}
               ></Backdrop>
             )}
             {children}
+            <RenderDialog />
+            <Preview_Backdrop />
           </div>
         </div>
       </div>

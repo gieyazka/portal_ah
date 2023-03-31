@@ -20,15 +20,16 @@ import {
 } from "@mui/icons-material";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import { headerTable, menuItem, subMenu } from "@/types/next-auth";
+import { useDialogStore, useFilterStore } from "@/store/store";
 import { useMyTask, useUser } from "@/utils/apiFn";
 import { usePathname, useRouter } from "next/navigation";
 
 import React from "react";
-import  RenderDialog  from "@/Components/dialog";
-import RenderTable from "./table";
+import RenderDialog from "@/Components/Dialog";
+import RenderTable from "@/Components/table";
+import ViewSickFlow from "@/Components/action_component/viewsickflow";
 import { filter } from "lodash";
 import menuData from "../menuItem";
-import { useFilterStore } from "./store";
 
 export default function SubComponent(props: any) {
   //  const router = useRouter ()
@@ -47,6 +48,8 @@ export default function SubComponent(props: any) {
     open: false,
     task: undefined,
   });
+  const dialogStore = useDialogStore();
+
   const [realData, setRealData] = React.useState();
   let subpath = props.currentSubPath;
   let status =
@@ -68,19 +71,6 @@ export default function SubComponent(props: any) {
     setDialogState({ open: true, task: task });
   };
 
-  const handleClose = () => {
-    setDialogState({ open: false, task: undefined });
-  };
-  const descriptionElementRef = React.useRef<HTMLElement>(null);
-  React.useEffect(() => {
-    if (dialogState.open) {
-      const { current: descriptionElement } = descriptionElementRef;
-      if (descriptionElement !== null) {
-        descriptionElement.focus();
-      }
-    }
-  }, [dialogState.open]);
-
   React.useMemo(() => {
     if (filterStore.isFetch) {
       setRealData(mytask.data);
@@ -91,7 +81,7 @@ export default function SubComponent(props: any) {
     { field: "Doc.id", value: "task_id" },
     { field: "Doc.Type", value: "data.flowName" },
     { field: "Request Emp_id", value: "data.requester.empid" },
-    { field: "Description", value: "data.reason" ,width : 200},
+    { field: "Description", value: "data.reason", width: 200 },
     { field: "IssueDate", value: "startedAt" },
     // { field: "Pending", value: "data.status" },
     { field: "Pending", value: "data.lastUpdate" },
@@ -99,12 +89,10 @@ export default function SubComponent(props: any) {
       field: "Action",
       value: "",
       color: "#F9FBFC",
-      component: (task: any) =>
-        ViewSickFlow({ task, handleClickOpen: handleClickOpen }),
+      component: (task: any) => ViewSickFlow({ task, dialogStore }),
     },
   ];
 
-  
   return (
     <div className=" relative overflow-auto ">
       <RenderTable
@@ -112,33 +100,7 @@ export default function SubComponent(props: any) {
         loading={loading}
         data={realData}
       />
-     
-        <RenderDialog dialogState={dialogState} handleClose={handleClose} descriptionElementRef={descriptionElementRef} user={user} />
-   
+
     </div>
   );
 }
-
-
-
-
-
-const ViewSickFlow = ({
-  task,
-  handleClickOpen,
-}: {
-  task: any;
-  handleClickOpen: (flowName: {}) => void;
-}) => {
-  return (
-    <IconButton
-      aria-label="delete"
-      size="large"
-      onClick={async () => {
-        handleClickOpen(task);
-      }}
-    >
-      <VisibilityIcon />
-    </IconButton>
-  );
-};

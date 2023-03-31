@@ -30,13 +30,14 @@ import {
   orderState,
   subMenu,
   tableFooter,
+  task,
 } from "@/types/next-auth";
 import dayjs, { Dayjs } from "dayjs";
 
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import commonJs from "@/utils/common";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { useFilterStore } from "./store";
+import { useFilterStore } from "../store/store";
 
 dayjs.extend(relativeTime);
 
@@ -111,7 +112,16 @@ const RenderExportTable = ({
       };
     });
   };
-
+  const handleFilter = (data: task[]) => {
+    let filter = filterStore.filterStr;
+    if (filter === undefined || filter === "") {
+      return data;
+    }
+    const filterData = data?.filter((d: task) => {
+      return d.task_id.includes(filter) || d.data.flowName.includes(filter);
+    });
+    return filterData;
+  };
   const sliceData = (data: {}[]) => {
     const cloneData = [...data];
     return cloneData.slice(tableFooter.start - 1, tableFooter.end);
@@ -159,7 +169,10 @@ const RenderExportTable = ({
         </div>
 
         <div>
+          {/* TODO: FILTER */}
           <input
+            value={filterStore.filterStr}
+            onChange={(e) => filterStore.handleChangeFilterStr(e.target.value)}
             placeholder="Filter"
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-2.5 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           />
@@ -220,9 +233,9 @@ const RenderExportTable = ({
             ? Array.from(new Array(10))
             : data !== undefined && data.length > 0
             ? currentOrder.value === undefined
-              ? sliceData(data)
+              ? sliceData(handleFilter(data))
               : _.orderBy(
-                  sliceData(data),
+                  sliceData(handleFilter(data)),
                   (item) =>
                     eval(
                       `item${commonJs.varString(
@@ -238,7 +251,7 @@ const RenderExportTable = ({
               className={` ${i % 2 !== 0 ? "bg-white" : "bg-gray-200"}`}
               key={i.toString()}
             >
-              {headerTable.map((key : any, index: number) => {
+              {headerTable.map((key: any, index: number) => {
                 if (key.component !== undefined) {
                   return (
                     <td key={key.field} className="text-center py-2">
@@ -267,10 +280,12 @@ const RenderExportTable = ({
                   return (
                     <td key={i.toString() + index.toString()}>
                       <div
-                        style={{
-                          // width: key.width || "auto",
-                          // wordBreak: "break-word",
-                        }}
+                        style={
+                          {
+                            // width: key.width || "auto",
+                            // wordBreak: "break-word",
+                          }
+                        }
                         className={`text-center px-4 py-2 `}
                         // style={{ minWidth: "75%", margin: "1px 0px 1px 0px" }}
                       >

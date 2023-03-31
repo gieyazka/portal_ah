@@ -8,7 +8,6 @@ import Link from "next/link";
 import MenuData from "./menuItem";
 import React from "react";
 import { Session } from "next-auth/core/types";
-import SeverSession from "./sesverSession";
 import Submenu from "./subMenu";
 import { authOptions } from "pages/api/auth/[...nextauth]";
 import axios from "axios";

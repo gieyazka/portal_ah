@@ -12,7 +12,6 @@ import dayjs from "dayjs";
 
 const Action_log = (props: { approverList: approverList[] | undefined }) => {
   const approverList = props.approverList;
-  console.log(approverList);
   if (approverList === undefined) {
     return <></>;
   }
@@ -103,12 +102,13 @@ const Action_log = (props: { approverList: approverList[] | undefined }) => {
                     )}
                   </div>
                   <hr className="my-2" />
-                  <div className="flex flex-col ">
-                    <p>
-                      <b>Reason</b> :{" "}
-                    </p>
-                    <p>{approverData.note}</p>
-                  </div>
+                </div>
+                <hr className="my-2" />
+                <div className="flex flex-col ">
+                  <p>
+                    <b>Reason</b> :{" "}
+                  </p>
+                  <p>{approverData.note}</p>
                 </div>
               </AccordionDetails>
             </Accordion>

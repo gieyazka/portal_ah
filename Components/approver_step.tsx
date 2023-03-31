@@ -1,4 +1,15 @@
-import { Check, Clear, Done, Person } from "@mui/icons-material";
+import {
+  Check,
+  Clear,
+  Done,
+  GroupAdd,
+  KeyboardReturn,
+  Lock,
+  Man,
+  Person,
+  Settings,
+  VideoLabel,
+} from "@mui/icons-material";
 import {
   Chip,
   Step,
@@ -31,72 +42,105 @@ const ApproverStep = (props: { task: task }) => {
   const currentPosition = usePosition();
   let nextAppoverArr = fn.getNextApprover(task);
 
-  const QontoConnector = styled(StepConnector)(({ theme }) => ({
+  const ColorlibConnector = styled(StepConnector)(({ theme }) => ({
     [`&.${stepConnectorClasses.alternativeLabel}`]: {
-      top: 10,
-      left: "calc(-50% + 16px)",
-      right: "calc(50% + 16px)",
+      top: 22,
     },
     [`&.${stepConnectorClasses.active}`]: {
       [`& .${stepConnectorClasses.line}`]: {
-        borderColor: "#1D336D",
+        margin: "0px 4px",
+
+        backgroundImage:
+          "linear-gradient( 95deg,#87BA21 0%,#87BA21 50%,#87BA21 100%)",
       },
     },
+    // [`&.${stepConnectorClasses.active}`]: {
+    //   [`& .${stepConnectorClasses.line}`]: {
+    //     [`~ .Mui-error`]: {
+    //       margin: "0px 2px",
+
+    //       backgroundImage:
+    //         "linear-gradient( 95deg,#FF0000 0%,#FF0000 50%,#FF0000 100%)",
+    //     },
+    //   },
+    // },
     [`&.${stepConnectorClasses.completed}`]: {
       [`& .${stepConnectorClasses.line}`]: {
-        borderColor: "#1D336D",
+        margin: "0px 4px",
+        backgroundImage:
+          "linear-gradient( 95deg,#87BA21 0%,#87BA21 50%, #1D336D 100%)",
       },
     },
     [`& .${stepConnectorClasses.line}`]: {
-      borderColor:
+      margin: "0px 4px",
+      height: 3,
+      border: 0,
+      backgroundColor:
         theme.palette.mode === "dark" ? theme.palette.grey[800] : "#eaeaf0",
-      borderTopWidth: 3,
       borderRadius: 1,
     },
   }));
-  function QontoStepIcon(props: StepIconProps) {
+  const ColorlibStepIconRoot = styled("div")<{
+    ownerState: { completed?: boolean; active?: boolean; error?: boolean };
+  }>(({ theme, ownerState }) => ({
+    backgroundColor:
+      theme.palette.mode === "dark" ? theme.palette.grey[700] : "#ccc",
+    zIndex: 1,
+    color: "#fff",
+    width: 50,
+    height: 50,
+    display: "flex",
+    borderRadius: "50%",
+    justifyContent: "center",
+    alignItems: "center",
+    ...(ownerState.active && {
+      // backgroundColor : '#1D336D',
+      color: "#1D336D",
+      backgroundColor: "transparent",
+      borderColor: "#1D336D",
+      borderWidth: 3,
+      boxShadow: "0 4px 10px 0 rgba(0,0,0,.25)",
+    }),
+    ...(ownerState.completed && {
+      // backgroundColor : '#1D336D',
+      color: "#87BA21",
+      backgroundColor: "transparent",
+      borderColor: "#87BA21",
+      borderWidth: 3,
+      boxShadow: "0 4px 10px 0 rgba(0,0,0,.25)",
+      // marginRight : 4
+    }),
+    ...(ownerState.error && {
+      color: "red",
+      backgroundColor: "transparent",
+      borderColor: "red",
+      borderWidth: 3,
+      boxShadow: "0 4px 10px 0 rgba(0,0,0,.25)",
+    }),
+  }));
+
+  const ColorlibStepIcon = (props: StepIconProps) => {
     const { active, completed, className, error } = props;
 
     return (
-      <QontoStepIconRoot ownerState={{ active }} className={className}>
-        {error ? (
-          <Clear className="QontoStepIcon-errorIcon" />
+      <ColorlibStepIconRoot
+        ownerState={{ completed, active, error }}
+        className={className}
+      >
+        {props.icon === 1 ? (
+          <Man />
+        ) : error ? (
+          <KeyboardReturn />
         ) : completed ? (
-          <Check className="QontoStepIcon-completedIcon" />
+          <Check />
+        ) : active ? (
+          <Settings />
         ) : (
-          <div className="QontoStepIcon-circle" />
+          <Lock />
         )}
-      </QontoStepIconRoot>
+      </ColorlibStepIconRoot>
     );
-  }
-  const QontoStepIconRoot = styled("div")<{ ownerState: { active?: boolean } }>(
-    ({ theme, ownerState }) => ({
-      color:
-        theme.palette.mode === "dark" ? theme.palette.grey[700] : "#eaeaf0",
-      display: "flex",
-      height: 22,
-      alignItems: "center",
-      ...(ownerState.active && {
-        color: "#1D336D",
-      }),
-      "& .QontoStepIcon-completedIcon": {
-        color: "#1D336D",
-        zIndex: 1,
-        fontSize: 18,
-      },
-      "& .QontoStepIcon-errorIcon": {
-        color: "red",
-        zIndex: 1,
-        fontSize: 18,
-      },
-      "& .QontoStepIcon-circle": {
-        width: 8,
-        height: 8,
-        borderRadius: "50%",
-        backgroundColor: "currentColor",
-      },
-    })
-  );
+  };
 
   const CurrentApprover = () => {
     if (currentPosition.isLoading) {
@@ -176,10 +220,12 @@ const ApproverStep = (props: { task: task }) => {
         <Stepper
           activeStep={current}
           alternativeLabel
-          connector={<QontoConnector />}
+          connector={<ColorlibConnector />}
         >
           <Step>
-            <StepLabel StepIconComponent={QontoStepIcon}>Submit Form</StepLabel>
+            <StepLabel StepIconComponent={ColorlibStepIcon}>
+              Submit Form
+            </StepLabel>
           </Step>
           {task.data.approverList !== undefined &&
             task.data.approverList.map((d: approverList, i: number) => {
@@ -202,9 +248,14 @@ const ApproverStep = (props: { task: task }) => {
               // );
               return (
                 <Step key={d.priority}>
-                  <StepLabel {...labelProps} StepIconComponent={QontoStepIcon}>
+                  <StepLabel
+                    {...labelProps}
+                    StepIconComponent={ColorlibStepIcon}
+                  >
                     <div className="flex flex-col">
-                      <p><Person /> {d.name}</p>
+                      <p>
+                        <Person /> {d.name}
+                      </p>
                       <p>{d.position}</p>
                       <p>
                         {d.company}_{d.department}_{d.section}
@@ -216,7 +267,7 @@ const ApproverStep = (props: { task: task }) => {
             })}
           {task.data.currentApprover && (
             <Step>
-              <StepLabel StepIconComponent={QontoStepIcon}>
+              <StepLabel StepIconComponent={ColorlibStepIcon}>
                 <div className="flex flex-col">
                   <CurrentApprover />
                 </div>
@@ -225,7 +276,7 @@ const ApproverStep = (props: { task: task }) => {
           )}
           {nextAppoverArr !== undefined && nextAppoverArr?.length > 0 && (
             <Step>
-              <StepLabel StepIconComponent={QontoStepIcon}>
+              <StepLabel StepIconComponent={ColorlibStepIcon}>
                 <div className="flex flex-col">
                   <NextApprover nextAppoverArr={nextAppoverArr} />
                 </div>
@@ -233,7 +284,7 @@ const ApproverStep = (props: { task: task }) => {
             </Step>
           )}
           <Step>
-            <StepLabel StepIconComponent={QontoStepIcon}>End</StepLabel>
+            <StepLabel StepIconComponent={ColorlibStepIcon}>End</StepLabel>
           </Step>
         </Stepper>
       )}

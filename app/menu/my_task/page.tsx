@@ -4,34 +4,43 @@
 import { Box, Tab, Typography } from "@mui/material";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import { menuItem, subMenu } from "@/types/next-auth";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import React from "react";
 import SubComponent from "./subComponent";
 import menuData from "../menuItem";
 
+export const dynamic = "force-dynamic";
 export default function MyTask(props: { searchParams: { current: string } }) {
   const router = useRouter();
-
+  const searchParams = useSearchParams();
   const pathName = usePathname();
   const splitPath = pathName ? pathName.split("/") : [];
   const lastPath = splitPath[splitPath.length - 1];
 
-  const handleChange = (event: React.SyntheticEvent, newValue: string) => {
-    router.replace(`/menu/my_task?current=${newValue}`);
-    setCurrentSubPath(newValue);
-  };
+  // const handleChange = (event: React.SyntheticEvent, newValue: string) => {
+  //   router.replace(`/menu/my_task?current=${newValue}`);
+  //   setCurrentSubPath(newValue);
+  // };
   const currentMenu: menuItem | undefined = menuData.find(
     (d) => d.url === lastPath
   );
 
-  const [currentSubPath, setCurrentSubPath] = React.useState(
-    props.searchParams.current === undefined
-      ? currentMenu !== undefined && currentMenu.subMenu[0].url
-      : props.searchParams.current
-  );
+  // const [currentSubPath, setCurrentSubPath] = React.useState(
+  //   props.searchParams.current === undefined
+  //     ? currentMenu !== undefined && currentMenu.subMenu[0].url
+  //     : props.searchParams.current
+  // );
+  const currentSubPath =
+   searchParams.get("current") === undefined
+      ? currentMenu?.subMenu[0].url
+      :searchParams.get("current");
   // React.useEffect(() => {
-  //   setCurrentSubPath(props.searchParams.current);
+  //   console.log(props.searchParams);
+
+  //   if (props.searchParams.current !== undefined) {
+  //     setCurrentSubPath(props.searchParams.current);
+  //   }
   // }, [props.searchParams.current]);
   return (
     <div className="m-2 bg-white rounded-xl">

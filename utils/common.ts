@@ -1,7 +1,10 @@
 import _, { first, isArray } from "lodash";
+import { approver, task } from "@/types/next-auth";
+import { useEffect, useState } from "react";
 
-import { approver } from "@/types/next-auth";
+import { Session } from 'next-auth';
 import convert from "xml-js"
+import { useUser } from '@/utils/apiFn';
 
 const varString = (varData: string[]) => {
     let newString: string | undefined = "";
@@ -108,7 +111,7 @@ const getNextApprover = (task: { [key: string]: any } | undefined) => {
 }
 
 
-const checkString = (str1: string | undefined, str2: string | undefined,addStr : string) => {
+const checkString = (str1: string | undefined, str2: string | undefined, addStr: string) => {
     if (str1 !== undefined) {
         return addStr + str1
     } else if (str2 !== undefined) {
@@ -120,9 +123,47 @@ const checkString = (str1: string | undefined, str2: string | undefined,addStr :
 }
 
 
+const useWidth = () => {
+    const [width, setWidth] = useState(0); // default width, detect on server.
+    const handleResize = () => setWidth(window.innerWidth);
+    useEffect(() => {
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, [handleResize]);
+    return window.innerWidth >= 1024;
+};
+
+
+const checkCanAction = (userSession: Session, task: task) => {
+    if (userSession !== undefined && task !== undefined) {
+
+        const user = userSession.user
+        const currentApprover = task.data.currentApprover
+        const matchFields = ['company', 'section', 'department', 'level', 'sub_section'];
+        //@ts-ignore
+        const matches = matchFields.every((field: string) => currentApprover[field] === user[field]);
+        return matches;
+    } else {
+        return false
+    }
+}
+
+const getBase64 = (file: Blob) =>
+    new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = (error) => reject(error);
+    });
+
+const deleteImage = (imageArr: any[], index: number) => {
+    imageArr.splice(index, 1);
+    return imageArr
+
+}
 
 const fn = {
-    varString, getNextApprover, checkString
+    varString, getNextApprover, checkString, useWidth, checkCanAction, getBase64, deleteImage
 }
 
 export default fn
