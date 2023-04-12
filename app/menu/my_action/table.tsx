@@ -3,7 +3,7 @@ import { Clear as ClearIcon, Done as DoneIcon } from "@mui/icons-material";
 import { DarkMode, LightMode } from "@mui/icons-material";
 import { IconButton, Tooltip } from "@mui/material";
 
-import { actionJob } from "@/utils/apiFn";
+import _apiFn from "@/utils/apiFn";
 import axios from "axios";
 import dayjs from "dayjs";
 
@@ -110,7 +110,7 @@ const RenderExportTable = ({
                             aria-label="delete"
                             size="large"
                             onClick={async () => {
-                              await actionJob(task, "false");
+                              // await actionJob(task, "false");
                               mytask.mutate()
                             }}
                           >
@@ -122,7 +122,7 @@ const RenderExportTable = ({
                             aria-label="delete"
                             size="large"
                             onClick={async () => {
-                              await actionJob(task, "true");
+                              // await actionJob(task, "true");
                               mytask.mutate()
                             }}
                           >

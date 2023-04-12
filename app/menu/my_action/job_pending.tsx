@@ -4,7 +4,6 @@
 import { Box, IconButton, Tab, Typography } from "@mui/material";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import { headerTable, userData } from "@/types/next-auth";
-import { useCurrentTask, useUser } from "@/utils/apiFn";
 import { useDialogStore, useFilterStore } from "../../../store/store";
 import { usePathname, useRouter } from "next/navigation";
 
@@ -13,6 +12,7 @@ import React from "react";
 import RenderTable from "../../../Components/table";
 import ViewSickFlow from "@/Components/action_component/viewsickflow";
 import { Visibility } from "@mui/icons-material";
+import _apiFn from "@/utils/apiFn";
 import menuData from "../menuItem";
 
 export default function Job_Pending(props: any) {
@@ -31,7 +31,7 @@ export default function Job_Pending(props: any) {
   const [loading, setLoading] = React.useState(false);
   const lastPath = splitPath[splitPath.length - 1];
   const [value, setValue] = React.useState("1");
-  const user = useUser();
+  const user = _apiFn.useUser();
   const [realData, setRealData] = React.useState();
   const handleClickOpen = (task: {}) => {
     setDialogState({ open: true, task: task });
@@ -44,7 +44,7 @@ export default function Job_Pending(props: any) {
       ? "Rejected"
       : "Success";
 
-  let mytask = useCurrentTask(user?.data?.user);
+  let mytask = _apiFn.useCurrentTask(user?.data?.user);
   React.useMemo(() => {
     if (filterStore.isFetch) {
       setRealData(mytask.data);

@@ -25,9 +25,9 @@ import Image from "next/image";
 import Leave_Flow from "../leaveflow";
 import React from "react";
 import { SWRResponse } from "swr";
+import _apiFn from "@/utils/apiFn";
 import _fn from "@/utils/common";
 import { useForm } from "react-hook-form";
-import { useUser } from "@/utils/apiFn";
 
 const RenderDialog = (props: {
   // dialogState: { open: boolean; task: { [key: string]: any } | undefined };
@@ -38,7 +38,7 @@ const RenderDialog = (props: {
   const dialogStore = useDialogStore();
   const handleClose = dialogStore.onCloseDialog;
   const { open, task, type } = { ...dialogStore };
-  const user = useUser();
+  const user = _apiFn.useUser();
   const {
     handleSubmit,
     register,
@@ -58,7 +58,6 @@ const RenderDialog = (props: {
     type: undefined,
   });
 
-
   register("file", { value: [] });
   const handleCloseSubialog = () => {
     setSubDialogState((prev) => {
@@ -73,7 +72,18 @@ const RenderDialog = (props: {
   };
   const storePreview = usePreviewStore();
 
-  const onSubmit = (values: any) => console.log(values);
+  const onSubmit = async (values: any) => {
+    // console.log(values);
+
+    const res = await _apiFn.actionJob(
+      task,
+      "approve",
+      true,
+      user.data,
+      values
+    );
+    console.log(res);
+  };
   const fileForm = watch("file") || [];
   const isAppOrRe = type === "approve" || type === "reject" ? true : false;
   const handlFileChange = (file: FileList | null) => {

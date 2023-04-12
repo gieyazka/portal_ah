@@ -3,8 +3,8 @@ import { approver, task } from "@/types/next-auth";
 import { useEffect, useState } from "react";
 
 import { Session } from 'next-auth';
+import _apiFn from '@/utils/apiFn';
 import convert from "xml-js"
-import { useUser } from '@/utils/apiFn';
 
 const varString = (varData: string[]) => {
     let newString: string | undefined = "";
@@ -162,8 +162,86 @@ const deleteImage = (imageArr: any[], index: number) => {
 
 }
 
+const removeAttrFromStrapi = (data: []) => {
+    cleanStrapiResponse(data)
+    // // console.log(data);
+
+    // let newData = [...data]
+    // for (let index = 0; index < newData.length; index++) {
+
+
+    //     do {
+    //         if (findNestedArrayWithKey(newData[index], "attributes")) {
+    //             // console.log(newData[index]);
+    //             if (findNestedArrayWithKey(newData[index].attributes, "data")) {
+    //                 // console.log(175);
+    //                 for (const [key, value] of Object.entries(newData[index].attributes)) {
+    //                     if (typeof value === "object" && "data" in (value as object)) {
+    //                         let delData_element = {
+    //                             ...newData[index].attributes[key].data
+    //                         }
+    //                         newData[index].attributes[key] = delData_element
+    //                     }
+    //                 }
+    //             }
+    //             let newElement = {
+    //                 ...newData[index], ...newData[index].attributes
+    //             }
+    //             delete newElement.attributes
+    //             newData[index] = newElement
+    //         }
+    //         console.log(newData[index]);
+
+    //     } while (false);
+    //     // console.log(newData[index]);
+    // }
+
+
+
+}
+
+const cleanStrapiResponse = (data: [] | {}) => {
+    let newData = []
+    if (Array.isArray(data)) {
+
+        for (let index = 0; index < data.length; index++) {
+            const element = data[index];
+            // console.log(element);
+            let newObj = { ...element, ...element.attributes }
+            delete newObj.attributes
+            console.log(newObj);
+        }
+    }
+}
+
+function findNestedArrayWithKey(arr: {}, key: string) {
+    if (Array.isArray(arr)) {
+        for (let item of arr) {
+            if (typeof item === 'object' && item !== null) {
+                if (item.hasOwnProperty(key)) {
+                    return true;
+                }
+                if (findNestedArrayWithKey(Object.values(item), key)) {
+                    return true;
+                }
+            }
+        }
+    }
+
+    if (typeof arr === 'object' && arr !== null) {
+        if (arr.hasOwnProperty(key)) {
+            return true;
+        }
+        if (findNestedArrayWithKey(Object.values(arr), key)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 const fn = {
-    varString, getNextApprover, checkString, useWidth, checkCanAction, getBase64, deleteImage
+    varString, getNextApprover, checkString, useWidth, checkCanAction, getBase64, deleteImage, removeAttrFromStrapi
 }
 
 export default fn

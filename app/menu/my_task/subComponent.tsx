@@ -21,13 +21,13 @@ import {
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import { headerTable, menuItem, subMenu } from "@/types/next-auth";
 import { useDialogStore, useFilterStore } from "@/store/store";
-import { useMyTask, useUser } from "@/utils/apiFn";
 import { usePathname, useRouter } from "next/navigation";
 
 import React from "react";
 import RenderDialog from "@/Components/Dialog";
 import RenderTable from "@/Components/table";
 import ViewSickFlow from "@/Components/action_component/viewsickflow";
+import _apiFn from "@/utils/apiFn";
 import { filter } from "lodash";
 import menuData from "../menuItem";
 
@@ -40,7 +40,7 @@ export default function SubComponent(props: any) {
   const [loading, setLoading] = React.useState(false);
   const lastPath = splitPath[splitPath.length - 1];
   const [value, setValue] = React.useState("1");
-  const user = useUser();
+  const user = _apiFn.useUser();
   const [dialogState, setDialogState] = React.useState<{
     open: boolean;
     task: { [key: string]: any } | undefined;
@@ -59,7 +59,7 @@ export default function SubComponent(props: any) {
       ? "Rejected"
       : "Success";
 
-  let mytask = useMyTask({
+  let mytask = _apiFn.useMyTask({
     empid: user?.data?.user?.name,
     status: status,
     startDate: filterStore.startDate,

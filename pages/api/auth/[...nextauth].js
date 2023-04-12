@@ -1,7 +1,6 @@
-import { getMyLevels, signInStrapi } from '@/utils/apiFn';
-
 import CredentialsProvider from 'next-auth/providers/credentials';
 import NextAuth from 'next-auth';
+import _fnApi from '@/utils/apiFn';
 import axios from 'axios';
 
 export const authOptions = {
@@ -16,8 +15,8 @@ export const authOptions = {
             async authorize(credentials, req) {
                 // console.log(credentials);
                 if (credentials == null) return null;
-                const res = await signInStrapi(credentials.username, credentials.password)
-                const myLevel = await getMyLevels(res.data.user.username)
+                const res = await _fnApi.signInStrapi(credentials.username, credentials.password)
+                const myLevel = await _fnApi.getMyLevels(res.data.user.username)
                 // Add logic here to look up the user from the credentials supplied
                 if (res.data.user && myLevel.data.status !== false) {
                     const user = {
@@ -51,7 +50,6 @@ export const authOptions = {
     callbacks: {
         // async signIn(user) {
         //     console.log('user: ' + JSON.stringify(user));
-
         //     // if (!user) return '/login';
 
         //     return '/layout'

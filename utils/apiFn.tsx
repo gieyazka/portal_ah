@@ -1,9 +1,10 @@
-import dayjs,{ Dayjs } from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
+import { task, userData } from "@/types/next-auth";
 import useSWR, { useSWRConfig } from "swr";
 
+import { Session } from "next-auth";
 import axios from "axios";
 import useSWRImmutable from "swr/immutable";
-import { userData } from "@/types/next-auth";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 const fetcherPost = (url: string, data: {}) =>
@@ -101,17 +102,59 @@ const getMyLevels = async (empid: string) => {
 
   return myLevel;
 };
-
-const actionJob = async (task: { items: { id: string }[] }, status: string) => {
-  const res = await axios.get(
-    `${process.env.NEXT_PUBLIC_WORKFLOW_URL}/api/engine/invoke/${
-      task.items.findLast((e) => e).id
-    }/approved/${status}`
+const getMyHierachies = async (empid: string) => {
+  // /api/hierachies
+  const myLevel = await axios.get(
+    `${process.env.NEXT_PUBLIC_Strapi}/api/hierachies?populate=*&filters[employee][empid][$eq]=${empid}`
   );
-  return res;
+  return myLevel;
 };
 
-export {
+const actionJob = async (
+  task: task | undefined,
+  field: string,
+  fieldData: any,
+  user: Session,
+  formData: any
+) => {
+  let data: any = {
+    task_id: task?.items.findLast((e: {}) => e).id,
+    field: field,
+    fieldData: fieldData,
+    user: user.user,
+    // formData,
+  };
+  let send_formData = new FormData();
+
+  for (const key in formData) {
+    if (Object.prototype.hasOwnProperty.call(formData, key)) {
+      const element = formData[key];
+      console.log(key, element);
+      if (key === "file") {
+        if (element.length > 0) {
+          element.forEach((fileData: any) => {
+            send_formData.append(`files`, fileData.file, fileData.name);
+          });
+        }
+        data["haveFile"] = true;
+      } else {
+        data[key] = element;
+      }
+    }
+  }
+  send_formData.append("data", JSON.stringify(data));
+  // console.log(data);
+  // console.log(formData);
+
+  const res = await axios({
+    method: "post",
+    url: `${process.env.NEXT_PUBLIC_WORKFLOW_URL}/api/engine/invoke/`,
+    data: send_formData,
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return res;
+};
+const _apiFn = {
   signInStrapi,
   useUser,
   useMyTask,
@@ -119,4 +162,6 @@ export {
   useCurrentTask,
   actionJob,
   usePosition,
+  getMyHierachies,
 };
+export default _apiFn;

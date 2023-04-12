@@ -23,8 +23,8 @@ import {
 } from "@mui/material";
 import { approver, approverList, task } from "@/types/next-auth";
 
+import _apiFn from "@/utils/apiFn";
 import fn from "@/utils/common";
-import { usePosition } from "@/utils/apiFn";
 
 const ApproverStep = (props: { task: task }) => {
   const task = props.task;
@@ -39,7 +39,7 @@ const ApproverStep = (props: { task: task }) => {
     }
   }
 
-  const currentPosition = usePosition();
+  const currentPosition = _apiFn.usePosition();
   let nextAppoverArr = fn.getNextApprover(task);
 
   const ColorlibConnector = styled(StepConnector)(({ theme }) => ({
@@ -146,7 +146,9 @@ const ApproverStep = (props: { task: task }) => {
     if (currentPosition.isLoading) {
       return <div>Loading</div>;
     }
-
+    if (currentPosition.data == undefined) {
+      return <div >No data</div>;
+    }
     return (
       <>
         {currentPosition.data !== undefined &&
@@ -177,12 +179,16 @@ const ApproverStep = (props: { task: task }) => {
     if (currentPosition.isLoading) {
       return <div>Loading</div>;
     }
+    if (currentPosition.data == undefined) {
+      return <div >No data</div>;
+    }
     return (
       <>
         {props.nextAppoverArr.map((d, i) => {
-          let curPOs = currentPosition.data.data.find(
-            (position: any) => position.attributes.level === d.level
-          );
+          let curPOs =
+            currentPosition.data.data.find(
+              (position: any) => position.attributes.level === d.level
+            ) || undefined;
           return (
             <>
               <p>{curPOs.attributes.position}</p>

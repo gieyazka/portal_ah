@@ -34,13 +34,13 @@ import Menu from "./menuItem";
 import Preview_Backdrop from "@/Components/preview_backdrop";
 import RenderDialog from "@/Components/Dialog";
 import { Session } from "next-auth/core/types";
+import _apiFn from "@/utils/apiFn";
 import { authOptions } from "pages/api/auth/[...nextauth]";
 import axios from "axios";
 import fn from "@/utils/common";
 import { useDialogStore } from "../../store/store";
 import useSWR from "swr";
 import { useState } from "react";
-import { useUser } from "@/utils/apiFn";
 
 export default function RootLayout({
   children,
@@ -48,7 +48,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   console.log("layout run");
-  const user = useUser();
+  const user = _apiFn.useUser();
 
   const pathName = usePathname();
   const splitPath = pathName ? pathName.split("/") : [];
