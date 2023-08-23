@@ -36,10 +36,10 @@
     "**/*.ts",
     "**/*.tsx",
     "pages/logintest/index.jsx",
-    "pages/api/auth/[...nextauth].ts",
-    "pages/api/auth/[...nextauth].ts",
+    "pages/apiTest/auth/[...nextauth].ts",
+    "pages/apiTest/auth/[...nextauth].ts",
     ".next/types/**/*.ts"
-, "app/page.ts", "app/login/page.jsx", "app/menu/my_task/page.tsx", "app/menu/my_action/page.tsx"  ],
+, "app/page.ts", "app/login/page.jsx", "app/menu/my_task/page.tsx", "app/menu/my_action/page.tsx", "pdf-worker.js", "pages/api/workflow/approve.ts"  ],
   "exclude": [
     "node_modules"
   ]

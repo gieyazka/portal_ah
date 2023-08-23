@@ -1,9 +1,11 @@
 import dayjs, { Dayjs } from "dayjs";
-import { task, userData } from "@/types/next-auth";
+import { filterStore, task, userData } from "@/types/next-auth";
 import useSWR, { useSWRConfig } from "swr";
 
 import { Session } from "next-auth";
+import _ from "lodash";
 import axios from "axios";
+import { useQuery } from "react-query";
 import useSWRImmutable from "swr/immutable";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -25,14 +27,57 @@ const signInStrapi = async (identifier: string, password: string) => {
   );
   return res;
 };
-
+const signOrgChart = async (identifier: string, password: string) => {
+  const res = await axios.post(
+    `${process.env.NEXT_PUBLIC_Strapi}/api/users`,
+    {
+      username: identifier,
+      password,
+    },
+    {
+      validateStatus: function (status) {
+        return status < 500;
+      },
+    }
+  );
+  return res;
+};
+const getUserData = async (email: string) => {
+  const res = await axios.post(
+    `${process.env.NEXT_PUBLIC_Strapi}/api/users/getUserByEmail`,
+    {
+      email,
+    },
+    {
+      validateStatus: function (status) {
+        return status < 500;
+      },
+    }
+  );
+  return res;
+};
+const getLDAPData = async (ldap_username: string) => {
+  const res = await axios.post(
+    `${process.env.NEXT_PUBLIC_Strapi}/api/users/getLdapByUsername`,
+    {
+      ldap_username: ldap_username,
+    },
+    {
+      validateStatus: function (status) {
+        return status < 500;
+      },
+    }
+  );
+  return res;
+};
+//DONE
 const useUser = () => {
   const user = useSWRImmutable("/api/auth/session", fetcher, {
     refreshInterval: 600000,
   });
   return user;
 };
-
+//DONE
 const useMyTask = (data: {
   empid: string;
   status: string;
@@ -42,10 +87,7 @@ const useMyTask = (data: {
 }) => {
   const myTask = useSWR(
     data.empid !== undefined && data.isFetch === true
-      ? [
-          `${process.env.NEXT_PUBLIC_WORKFLOW_URL}/custom_api/find_my_task`,
-          data,
-        ]
+      ? [`/api/workflow/find_my_task`, data]
       : null,
     ([url, data]) => fetcherPost(url, data),
     {
@@ -60,7 +102,7 @@ const useMyTask = (data: {
 
 const usePosition = () => {
   const myTask = useSWR(
-    `${process.env.NEXT_PUBLIC_Strapi}/api/levels`,
+    `/api/orgchart/levels`,
 
     (url) => fetcher(url),
     {
@@ -72,14 +114,14 @@ const usePosition = () => {
   );
   return myTask;
 };
-
-const useCurrentTask = (user: userData) => {
+//DONE
+const useAction_logs = (data: { user: userData; filterStore: filterStore }) => {
+  if (data.user) {
+    delete data.user.jwt;
+  }
   const myTask = useSWR(
-    user !== undefined
-      ? [
-          `${process.env.NEXT_PUBLIC_WORKFLOW_URL}/custom_api/find_user_approve`,
-          user,
-        ]
+    data.user !== undefined && data.filterStore.isFetch === true
+      ? [`/api/workflow/find_action_logs`, data]
       : null,
     ([url, data]) => fetcherPost(url, data),
     {
@@ -91,7 +133,37 @@ const useCurrentTask = (user: userData) => {
   );
   return myTask;
 };
-
+//DONE
+const useCurrentTask = (data: { user: userData; filterStore: filterStore }) => {
+  const myTask = useSWR(
+    data.user !== undefined && data.filterStore.isFetch === true
+      ? [`/api/workflow/find_user_approve`, data]
+      : null,
+    ([url, data]) => fetcherPost(url, data),
+    {
+      refreshInterval: 600000,
+      // revalidateIfStale: false,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+    }
+  );
+  return myTask;
+};
+//DONE
+const useTaskByItemID = (itemID: string | undefined) => {
+  const myTask = useSWR(
+    itemID !== undefined ? [`/api/workflow/getTaskByItemID`, itemID] : null,
+    ([url, data]) => fetcherPost(url, data),
+    {
+      refreshInterval: 600000,
+      revalidateIfStale: false,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+    }
+  );
+  return myTask;
+};
+//NOT USE
 const getMyLevels = async (empid: string) => {
   const myLevel = await axios.post(
     `${process.env.NEXT_PUBLIC_Strapi}/api/hierachies/checkMyLevel`,
@@ -102,6 +174,7 @@ const getMyLevels = async (empid: string) => {
 
   return myLevel;
 };
+//NOT USE
 const getMyHierachies = async (empid: string) => {
   // /api/hierachies
   const myLevel = await axios.get(
@@ -109,59 +182,139 @@ const getMyHierachies = async (empid: string) => {
   );
   return myLevel;
 };
-
+//DONE
 const actionJob = async (
   task: task | undefined,
   field: string,
   fieldData: any,
-  user: Session,
+  user: Session | undefined,
   formData: any
 ) => {
+  const lastItem: any = _.last(task?.items);
   let data: any = {
-    task_id: task?.items.findLast((e: {}) => e).id,
+    task_id: lastItem.id,
     field: field,
     fieldData: fieldData,
-    user: user.user,
+    user: user?.user ?? null,
     // formData,
   };
-  let send_formData = new FormData();
 
+  let send_formData = new FormData();
+  data["haveFile"] = false;
   for (const key in formData) {
     if (Object.prototype.hasOwnProperty.call(formData, key)) {
       const element = formData[key];
-      console.log(key, element);
       if (key === "file") {
         if (element.length > 0) {
           element.forEach((fileData: any) => {
             send_formData.append(`files`, fileData.file, fileData.name);
           });
+          data["haveFile"] = true;
         }
-        data["haveFile"] = true;
       } else {
         data[key] = element;
       }
     }
   }
   send_formData.append("data", JSON.stringify(data));
-  // console.log(data);
   // console.log(formData);
-
   const res = await axios({
     method: "post",
-    url: `${process.env.NEXT_PUBLIC_WORKFLOW_URL}/api/engine/invoke/`,
+    url: `/api/workflow/approve/`,
     data: send_formData,
     headers: { "Content-Type": "multipart/form-data" },
+    validateStatus: function (status) {
+      return status < 500; // Resolve only if the status code is less than 500
+    },
   });
+
+  // const res = await axios({
+  //   method: "post",
+  //   url: `${process.env.NEXT_PUBLIC_WORKFLOW_URL}/api/engine/invoke/`,
+  //   data: send_formData,
+  //   headers: { "Content-Type": "multipart/form-data" },
+  //   validateStatus: function (status) {
+  //     return status < 500; // Resolve only if the status code is less than 500
+  //   },
+  // });
   return res;
 };
+// const emailApprove = async (
+//   taskID: string,
+//   field: string,
+//   fieldData: any,
+//   formData: any
+// ) => {
+//   let data: any = {
+//     task_id: taskID,
+//     field: field,
+//     fieldData: fieldData,
+//     // formData,
+//   };
+//   let send_formData = new FormData();
+//   data["haveFile"] = false;
+//   for (const key in formData) {
+//     if (Object.prototype.hasOwnProperty.call(formData, key)) {
+//       const element = formData[key];
+//       if (key === "file") {
+//         if (element.length > 0) {
+//           element.forEach((fileData: any) => {
+//             send_formData.append(`files`, fileData.file, fileData.name);
+//           });
+//           data["haveFile"] = true;
+//         }
+//       } else {
+//         data[key] = element;
+//       }
+//     }
+//   }
+//   send_formData.append("data", JSON.stringify(data));
+//   // console.log(data);
+//   // console.log(formData);
+
+//   const res = await axios({
+//     method: "post",
+//     url: `/api/workflow/approve/`,
+//     data: send_formData,
+//     headers: { "Content-Type": "multipart/form-data" },
+//   });
+//   // const res = await axios({
+//   //   method: "post",
+//   //   url: `${process.env.NEXT_PUBLIC_WORKFLOW_URL}/api/engine/invoke/`,
+//   //   data: send_formData,
+//   //   headers: { "Content-Type": "multipart/form-data" },
+//   // });
+//   return res;
+// };
+
+//์from Ess
+const useLeaveDay = (site: string | undefined, type: string | undefined) => {
+  const leaveday = useSWRImmutable(
+    site === undefined
+      ? null
+      : `https://ess.aapico.com/calendars?site=${site}&subsite=${type}&_limit=-1`,
+    fetcher
+    // { refreshInterval: 10000 }
+  );
+  return leaveday;
+  // return { data: selectMachine, error, isLoading };
+};
+
 const _apiFn = {
   signInStrapi,
+  signOrgChart,
+  getUserData,
+  getLDAPData,
   useUser,
   useMyTask,
   getMyLevels,
   useCurrentTask,
+  useTaskByItemID,
   actionJob,
   usePosition,
   getMyHierachies,
+  useAction_logs,
+  useLeaveDay,
+  // emailApprove,
 };
 export default _apiFn;

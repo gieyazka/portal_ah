@@ -1,6 +1,9 @@
 import { approver } from '@/types/next-auth';
 import NextAuth, { DefaultSession } from "next-auth"
 import React from 'react'
+import { AlertColor } from "@mui/material/Alert";
+import { SWRResponse } from "swr";
+
 declare module "next-auth" {
   /**
    * Returned by `useSession`, `getSession` and received as a prop on the `SessionProvider` React Context
@@ -18,6 +21,12 @@ declare module "next-auth" {
       section?: string
       sub_section?: string | undefined
       priority?: string
+      username?: string
+      firstName?: string
+      lastName?: string
+      fullName?: string
+      prefix?: string
+      position?: string
     } & DefaultSession["user"]
   }
 }
@@ -49,11 +58,13 @@ type subMenu = {
 
 }
 type headerTable = {
+  label: string;
   field: string;
   value: string;
   color?: string;
   fontColor?: string;
   component?: ReactDOM
+  actionClick?: (props: any) => void
   width?: string | number
 }
 
@@ -89,19 +100,29 @@ type previewStore = {
   open: boolean;
   file: string | undefined;
   type: string | undefined;
-  onShowBackDrop: (file: Blob, type: string) => void;
+  onShowBackDrop: (file: Blob | string, type: string) => void;
   onHideBackDrop: () => void;
 }
 
 type filterStore = {
-  startDate: Dayjs;
-  endDate: Dayjs;
+  [x: string]: any;
+  open: boolean,
+  startDate: Dayjs | null;
+  endDate: Dayjs | null;
   isFetch: boolean;
+  period: number | undefined;
+  docType: string | null,
   filterStr: string | undefined;
+  filterDoc: string | undefined;
+  arrDoc: { label: string, value: stirg }[],
+  handleOpenDrawer: (transformedArray: any) => void;
+  handleCloseDrawer: () => void;
   handleChangeStartDate: (newDate: Dayjs) => void;
   handleChangeEndDate: (newDate: Dayjs) => void;
   handleChangeFilterStr: (str: string | undefined) => void;
+  handleChangeFilterDoc: (str: string | undefined) => void;
   searchClick: () => void;
+  handleChangePeriod: (period: number | undefined) => void;
 }
 
 type requester = {
@@ -120,18 +141,48 @@ type approverList = {
   department: string | undefined
   date: string | undefined
   sub_section: string | undefined
-  note: string | undefined
+  remark: string | undefined
   action: string | undefined
+  filesURL: string[] | null | undefined
 }
 
 type DialogStore = {
   open: boolean;
   task: task | undefined
   type?: string | undefined,
-  onOpenDialog: (task: any, type?: string | undefined) => void;
+  swrResponse?: SWRResponse | undefined,
+  onOpenDialog: (prop: { task: any, type?: string | undefined, swrResponse?: SWRResponse | undefined }) => void,
   onCloseDialog: () => void;
+  onReload: (prop: { task: any }) => void;
 }
-
+type actionDialogStore = {
+  open: boolean;
+  task: task | undefined
+  action: boolean | undefined;
+  type?: string | undefined,
+  swrResponse?: SWRResponse | undefined,
+  onOpenDialog: (prop: { task: any, type?: string | undefined, swrResponse?: SWRResponse | undefined, action: boolean }) => void,
+  onCloseDialog: () => void;
+  onReload: (prop: { task: any }) => void;
+}
+type snackbarStore = {
+  open: boolean;
+  message: string
+  type?: AlertColor | undefined,
+  countdown: number,
+  progress: number,
+  showSnackBar: (message: string, type?: string | undefined) => void;
+  closeSnackbar: () => void;
+  onCountdown: () => void
+}
+type viewStore = {
+  isMd: boolean | undefined,
+  setMd: (data: boolean) => void;
+}
+type loadingStore = {
+  isLoading: boolean,
+  setLoading: (isLoad: boolean) => void;
+}
 type fileData = {
   type: string
   name: string

@@ -1,9 +1,11 @@
 import _, { first, isArray } from "lodash";
-import { approver, task } from "@/types/next-auth";
+import { approver, previewStore, task } from "@/types/next-auth";
 import { useEffect, useState } from "react";
 
 import { Session } from 'next-auth';
+import Swal from "sweetalert2";
 import _apiFn from '@/utils/apiFn';
+import axios from "axios";
 import convert from "xml-js"
 
 const varString = (varData: string[]) => {
@@ -13,18 +15,102 @@ const varString = (varData: string[]) => {
     });
     return newString;
 };
+const callToast = ({ title, type }: any) => {
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer)
+            toast.addEventListener('mouseleave', Swal.resumeTimer)
+        }
+    })
+
+    Toast.fire({
+        icon: type,
+        title: title
+    })
+}
+const getStrName = (fullname: string) => {
+    if (fullname === undefined) {
+        return ""
+    }
+    let nameParts = fullname.replace("  ", " ").split(".");
+
+    if (nameParts.length > 1) {
+        nameParts = nameParts[1].split(" ")
+    } else {
+        nameParts = nameParts[0].split(" ")
+    }
+    let firstName = nameParts[0];
+    let lastName = nameParts[1];
+    let firstCharacter = firstName[0] + lastName[0];
+    return firstCharacter
+}
+
+const getByCondition: any = (allTask: any, gatewayArr: any, condition: boolean | undefined, taskData: any) => {
+
+    let gatewayCondition = undefined
+    let useData = undefined
+    let isDo = true
+    // for (let index = 0; index < gatewayArr['bpmn2:outgoing'].length; index++) {
+    //     const data = gatewayArr['bpmn2:outgoing'][index];
+    //     for (let index = 0; index < allTask.length; index++) {
+    //         const d = allTask[index];
+    //         if (d._attributes.id === data['_text']) {
+
+    //             gatewayCondition = d['bpmn2:conditionExpression']
+    //         }
+    //     }
+    //     if (gatewayArr['_attributes'].name === "check_resend") {
+    //         if (gatewayCondition['_text'].includes("false") && taskData.data.status === 'Rejected') {
+    //             // return true
+    //             useData = data
+    //             break
+
+    //         }
+    //         continue
+    //     }
+    //     if (gatewayCondition['_text'].includes(condition?.toString())) {
+    //         useData = data
+    //         break
+    //         // return true
+    //     }
 
 
-const getByCondition: any = (allTask: any, gatewayArr: {}[], condition: boolean | undefined) => {
-    return gatewayArr.find((data: { [key: string]: any }) => {
-        let gatewayCondition = allTask.find((d: any) => d._attributes.id === data['_text'])['bpmn2:conditionExpression']
+    //     else {
+    //         continue
+    //     }
+    // }
+    // console.log("useData",useData);
+    // return useData
+    // console.log(33, gatewayCondition);
+    return gatewayArr['bpmn2:outgoing'].find((data: { [key: string]: any }) => {
+        // console.log(2222, data);
+        let gatewayCondition = allTask.find((d: any) => {
+            // console.log(22, d._attributes.id, data['_text']);
+
+            return d._attributes.id === data['_text']
+        })['bpmn2:conditionExpression']
+        // console.log(21, gatewayCondition);
+        // if (gatewayArr['_attributes'].name === "check_resend") {
+        //     // console.log("check_resend", isDo, gatewayCondition['_text']);
+        //     if (gatewayCondition['_text'].includes("false") && taskData.data.status === 'Rejected' && isDo === 1) {
+        //         // return true
+        //     }
+        //     return false
+        // }
         if (gatewayCondition['_text'].includes(condition?.toString())) {
             return true
 
-        } else {
-            return false
         }
 
+
+        else {
+            return false
+        }
     })
 }
 
@@ -36,20 +122,23 @@ const getAllUserTask = (xml: any) => {
 
 }
 
-const checkApp = (xml: any, userTask: any, allTask: any, nextCondition: boolean | undefined) => {
-    const allUserTask = getAllUserTask(xml);
+const checkApp = (taskData: any, userTask: any, allTask: any, nextCondition: boolean | undefined) => {
+    const allUserTask = getAllUserTask(taskData.source);
+    // console.log(allUserTask);
     let isDo: boolean = true
-    let i = 0;
     let nextNodeId: string | null = null;
     let oldNodeId: string | null = null;
     let task: any = allTask.find((d: any) => d._attributes.id === userTask.elementId)
     let nextApprover: approver[] = []
     do {
-        i = i + 1;
+        // console.log(oldNodeId,nextNodeId);
         if (task.hasOwnProperty("bpmn2:outgoing")) {
             if (isArray(task['bpmn2:outgoing'])) {
-                let nextTaskId = getByCondition(allTask, task['bpmn2:outgoing'], nextCondition)
+                let nextTaskId = getByCondition(allTask, task, nextCondition, taskData)
+                // if (nextTaskId) {
                 nextNodeId = nextTaskId['_text'];
+
+                // }
             } else {
                 nextNodeId = (task['bpmn2:outgoing']['_text']);
             }
@@ -71,6 +160,7 @@ const checkApp = (xml: any, userTask: any, allTask: any, nextCondition: boolean 
         }
         oldNodeId = nextNodeId
     } while (isDo);
+    // console.log(nextApprover);
     return nextApprover
 }
 
@@ -79,6 +169,7 @@ const getNextApprover = (task: { [key: string]: any } | undefined) => {
     if (task === undefined) {
         return;
     }
+
     const userTask = task.items.find((d: {
         status: string; type: string;
     }) => d.type === "bpmn:UserTask" && d.status === 'wait')
@@ -100,8 +191,7 @@ const getNextApprover = (task: { [key: string]: any } | undefined) => {
 
         }
 
-
-        return checkApp(task.source, userTask, allTask, true)
+        return checkApp(task, userTask, allTask, true)
 
     } catch (error) {
         console.error(error);
@@ -110,7 +200,19 @@ const getNextApprover = (task: { [key: string]: any } | undefined) => {
 
 }
 
-
+const isImageFile = (fileName: string) => {
+    const imageExtensions = [
+        ".jpg",
+        ".jpeg",
+        ".png",
+        ".gif",
+        ".svg",
+        ".bmp",
+    ];
+    return imageExtensions.some((ext) =>
+        fileName.toLowerCase().endsWith(ext)
+    );
+};
 const checkString = (str1: string | undefined, str2: string | undefined, addStr: string) => {
     if (str1 !== undefined) {
         return addStr + str1
@@ -135,13 +237,17 @@ const useWidth = () => {
 
 
 const checkCanAction = (userSession: Session, task: task) => {
-    if (userSession !== undefined && task !== undefined) {
+    console.log("in Can action", userSession, task);
 
+    if (userSession !== undefined && task !== undefined) {
         const user = userSession.user
         const currentApprover = task.data.currentApprover
+        if (currentApprover == null) {
+            return false
+        }
         const matchFields = ['company', 'section', 'department', 'level', 'sub_section'];
         //@ts-ignore
-        const matches = matchFields.every((field: string) => currentApprover[field] === user[field]);
+        const matches = matchFields.every((field: string) => currentApprover[field] === user[field]) || user.username === currentApprover.empid
         return matches;
     } else {
         return false
@@ -240,8 +346,40 @@ function findNestedArrayWithKey(arr: {}, key: string) {
     return false;
 }
 
+const onPreviewFile = async (file: string | Blob, type: string, storePreview: previewStore) => {
+    if (type === "pdf") {
+        if (typeof file === "string") {
+
+            const res = await axios.get(`${process.env.NEXT_PUBLIC_Strapi}${file}`, {
+                responseType: "blob",
+            });
+            const pdfBlob = new Blob([res.data], {
+                type: "application/pdf",
+            });
+            storePreview.onShowBackDrop(pdfBlob, "pdf");
+        } else {
+            storePreview.onShowBackDrop(file, "pdf");
+        }
+    }
+
+    if (type === "image") {
+        storePreview.onShowBackDrop(
+            typeof file === "string" ? `${process.env.NEXT_PUBLIC_Strapi}${file}` : URL.createObjectURL(file),
+            "image"
+        );
+    }
+    if (type === "file") {
+        if (typeof file === "string") {
+            var link = document.createElement("a");
+            link.setAttribute("href", `${process.env.NEXT_PUBLIC_Strapi}${file}`);
+            link.click();
+        }
+    }
+};
+
 const fn = {
-    varString, getNextApprover, checkString, useWidth, checkCanAction, getBase64, deleteImage, removeAttrFromStrapi
+    callToast, onPreviewFile,
+    getStrName, varString, getNextApprover, isImageFile, checkString, useWidth, checkCanAction, getBase64, deleteImage, removeAttrFromStrapi
 }
 
 export default fn

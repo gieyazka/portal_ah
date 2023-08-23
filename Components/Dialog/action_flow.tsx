@@ -1,4 +1,4 @@
-import Leave_Flow from "../leaveflow";
+import Leave_Flow from "../Leave";
 import { task } from "@/types/next-auth";
 
 const ActionFlow = (props: { task: task; type: string }) => {

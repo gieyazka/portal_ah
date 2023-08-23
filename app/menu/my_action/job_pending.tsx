@@ -1,30 +1,32 @@
 "use client";
 // import UserData from "./userData";
 
-import { Box, IconButton, Tab, Typography } from "@mui/material";
+import { Box, Button, IconButton, Tab, Typography } from "@mui/material";
+import { PermIdentity, Visibility } from "@mui/icons-material";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import { headerTable, userData } from "@/types/next-auth";
-import { useDialogStore, useFilterStore } from "../../../store/store";
+import {
+  useActionDialogStore,
+  useDialogStore,
+  useFilterStore,
+  useSnackbarStore,
+  useViewStore,
+} from "../../../store/store";
 import { usePathname, useRouter } from "next/navigation";
 
-import Action_Flow from "@/Components/action_component/action_flow";
+import Card_Mobile from "./card_mobile";
 import React from "react";
-import RenderTable from "../../../Components/table";
+import RenderTable from "./table";
 import ViewSickFlow from "@/Components/action_component/viewsickflow";
-import { Visibility } from "@mui/icons-material";
 import _apiFn from "@/utils/apiFn";
 import menuData from "../menuItem";
 
 export default function Job_Pending(props: any) {
   const filterStore = useFilterStore();
-  const [dialogState, setDialogState] = React.useState<{
-    open: boolean;
-    task: { [key: string]: any } | undefined;
-  }>({
-    open: false,
-    task: undefined,
-  });
+  const viewStore = useViewStore();
   const dialogStore = useDialogStore();
+  const actionDialogStore = useActionDialogStore();
+  const snackbarStore = useSnackbarStore();
 
   const pathName = usePathname();
   const splitPath = pathName ? pathName.split("/") : [];
@@ -32,10 +34,8 @@ export default function Job_Pending(props: any) {
   const lastPath = splitPath[splitPath.length - 1];
   const [value, setValue] = React.useState("1");
   const user = _apiFn.useUser();
+  console.log("user", user);
   const [realData, setRealData] = React.useState();
-  const handleClickOpen = (task: {}) => {
-    setDialogState({ open: true, task: task });
-  };
   let subpath = props.currentSubPath;
   let status =
     subpath === "in_process"
@@ -44,48 +44,78 @@ export default function Job_Pending(props: any) {
       ? "Rejected"
       : "Success";
 
-  let mytask = _apiFn.useCurrentTask(user?.data?.user);
+  let mytask = _apiFn.useCurrentTask({
+    user: user?.data?.user,
+    filterStore: filterStore,
+  });
   React.useMemo(() => {
     if (filterStore.isFetch) {
       setRealData(mytask.data);
     }
+    if (dialogStore.open && dialogStore.task !== undefined) {
+      const selectedTask = mytask.data.find(
+        (d: any) => d.task_id === dialogStore.task?.task_id
+      );
+      if (selectedTask === undefined) {
+        dialogStore.onCloseDialog();
+      } else {
+        dialogStore.onReload({ task: selectedTask });
+      }
+    }
   }, [filterStore.isFetch, mytask.data]);
+
   const headerTable: headerTable[] = [
-    { field: "Doc.id", value: "task_id" },
-    { field: "Doc.Type", value: "data.flowName" },
-    { field: "Request Emp_id", value: "data.requester.empid" },
+    { label: "Doc.Type", field: "Doc.Type", value: "data.flowName" },
     {
+      label: "Emp.ID",
+      field: "Emp_id",
+      value: "data.requester.empid",
+      width: 150,
+    },
+    {
+      label: "Requester",
+      field: "Requester",
+      value: "data.requester.name",
+      width: 300,
+    },
+    {
+      label: "Description",
       field: "Description",
       value: "data.reason",
-      width: 200,
-      component: (task: any) => (
-        <div>
-          {task.data.flowName === "leave_flow"
-            ? task.data.type
-            : task.data.reason}
-        </div>
-      ),
     },
-    { field: "IssueDate", value: "startedAt" },
-    // { field: "Pending", value: "data.status" },
-    { field: "Pending", value: "data.lastUpdate" },
+    { label: "Issue Date", field: "IssueDate", value: "issueDate" },
+    { label: "Req.Status", field: "status", value: "data.status" },
+    // { field: "Pending", value: "data.lastUpdate" },
+
     {
+      label: "Action",
       field: "Action",
       value: "",
-      color: "#F9FBFC",
-      component: (task: any) => (
-        <div>
-          <div className="flex justify-center">
-            {Action_Flow({ task, dialogStore, type: "reject" })}
-            {Action_Flow({ task, dialogStore, type: "approve" })}
-            {ViewSickFlow({ task, dialogStore })}
-          </div>
-        </div>
-      ),
+      // color: "#F9FBFC",
+      actionClick: ({ task, iconStyle }: { task: any; iconStyle?: string }) => {
+        //@ts-ignore
+        dialogStore.onOpenDialog({ task, swrResponse: mytask });
+      },
+
+      component: ({ task, iconStyle }: { task: any; iconStyle?: string }) =>
+        ViewSickFlow({ task, dialogStore, swrResponse: mytask, iconStyle }),
     },
   ];
+  if (!viewStore.isMd) {
+    return (
+      <div className="w-full h-full ">
+        <Card_Mobile
+          headerTable={headerTable}
+          loading={mytask.isLoading}
+          data={realData}
+          swrResponse={mytask}
+        />
+      </div>
+    );
+  }
+
   return (
-    <div className=" relative overflow-auto  ">
+    <div className=" relative overflow-auto h-full  ">
       <RenderTable
         headerTable={headerTable}
         loading={loading}

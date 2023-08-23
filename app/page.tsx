@@ -1,12 +1,10 @@
-import SeverSes from "./menu/sesverSession";
-import UserData from "./userData";
+"use client";
+
 
 export default function HomePage() {
   return (
     <div>
-      {/* <UserData> */}
-        {/* <SeverSes />
-      </UserData> */}
+     
     </div>
   );
 }

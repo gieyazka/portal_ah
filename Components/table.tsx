@@ -33,11 +33,12 @@ import {
   task,
 } from "@/types/next-auth";
 import dayjs, { Dayjs } from "dayjs";
+import { useFilterStore, useSnackbarStore } from "../store/store";
 
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { SWRResponse } from "swr";
 import commonJs from "@/utils/common";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { useFilterStore } from "../store/store";
 
 dayjs.extend(relativeTime);
 
@@ -55,12 +56,13 @@ const RenderExportTable = ({
     type: undefined,
   });
   const filterStore = useFilterStore();
+  const snackbarStore = useSnackbarStore();
 
   const [tableFooter, setTableFooter] = useState<tableFooter>({
     page: 1,
-    rowPerpage: 5,
+    rowPerpage: 10,
     start: 1,
-    end: 5,
+    end: 10,
   });
   const handleClickHeader = (key: headerTable, currentOrder: orderState) => {
     if (key.field === "Action") {
@@ -126,7 +128,6 @@ const RenderExportTable = ({
     const cloneData = [...data];
     return cloneData.slice(tableFooter.start - 1, tableFooter.end);
   };
-
   return (
     <div className="overflow-auto">
       <div className="mb-4 flex items-end justify-between">
@@ -148,6 +149,8 @@ const RenderExportTable = ({
             value={filterStore.endDate || null}
             format="DD/MM/YYYY"
             label="End date"
+            minDate={filterStore.startDate}
+
             slots={{
               textField: CustomInput,
             }}
@@ -161,6 +164,7 @@ const RenderExportTable = ({
             type="button"
             className="h-max  text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5  dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
             onClick={() => {
+              // snackbarStore.showSnackBar("test","success")
               filterStore.searchClick();
             }}
           >
@@ -255,7 +259,7 @@ const RenderExportTable = ({
                 if (key.component !== undefined) {
                   return (
                     <td key={key.field} className="text-center py-2">
-                      {key.component(task)}
+                      {key.component({ task })}
                     </td>
                   );
                 } else {
@@ -276,6 +280,11 @@ const RenderExportTable = ({
                   if (key.field === "Pending") {
                     value = value && dayjs(value).fromNow(true);
                   }
+                  if (key.field === "Doc.Type") {
+                    if (value === "leave_flow") {
+                      value = "E-Leave";
+                    }
+                  }
 
                   return (
                     <td key={i.toString() + index.toString()}>
@@ -289,7 +298,15 @@ const RenderExportTable = ({
                         className={`text-center px-4 py-2 `}
                         // style={{ minWidth: "75%", margin: "1px 0px 1px 0px" }}
                       >
-                        {!loading ? <>{value}</> : <Skeleton />}
+                        {!loading ? (
+                          key.fild === "Doc.id" ? (
+                            <p className='whitespace-nowrap'>{value}</p>
+                          ) : (
+                            <p>{value}</p>
+                          )
+                        ) : (
+                          <Skeleton />
+                        )}
                       </div>
                     </td>
                   );
@@ -304,7 +321,7 @@ const RenderExportTable = ({
           <p>Row per page : &nbsp; </p>
           <span>
             <select
-              defaultValue={5}
+              defaultValue={10}
               onChange={(e) => {
                 setTableFooter((prev: tableFooter) => {
                   return {
