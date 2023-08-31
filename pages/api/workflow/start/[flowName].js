@@ -4,8 +4,6 @@ import FormData from 'form-data';
 import axios from 'axios'
 import multer from 'multer';
 
-const upload = multer()
-
 function runMiddleware(req, res, fn) {
     return new Promise((resolve, reject) => {
         fn(req, res, (result) => {

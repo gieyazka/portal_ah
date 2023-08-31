@@ -1,12 +1,10 @@
 import { previewStore, task } from "@/types/next-auth";
 import { usePreviewStore, useViewStore } from "@/store/store";
 
-import Action_log from "../Action_log/action_log";
-import Action_log_Mobile from "../Action_log/action_log_Mobile";
+import Action_log from "../Action_log/";
 import ApproverStep from "../approver_step";
 import ApproverStepMobile from "../approver_step_Mobile";
-import FileAttach from "../fileAttached";
-import FileAttachMobile from "../fileAttached_Mobile";
+import FileAttach from "../FileAttached/";
 import Image from "next/image";
 import LeaveDetail from "./leaveflow";
 import LeaveDetailMobile from "./leaveflow_Mobile";
@@ -70,7 +68,7 @@ const Leave_Flow = (props: { task: task }) => {
       <div className="">
         <ApproverStep task={task} />
         <div className="flex w-full h-full gap-2 my-2">
-          <div className=" ">
+          <div>
             <LeaveDetail
               getTileClassName={getTileClassName}
               task={task}
@@ -78,7 +76,7 @@ const Leave_Flow = (props: { task: task }) => {
               leaveDaySwr={leaveDay}
             />
           </div>
-          <div className="w-1/2 flex flex-col items-stretch gap-2 relative ">
+          <div className="w-auto flex flex-col items-stretch gap-2 relative ">
             <div className="flex-grow relative ">
               <Requester requester={task?.data.requester} />
             </div>
@@ -100,9 +98,9 @@ const Leave_Flow = (props: { task: task }) => {
           storePreview={storePreview}
           leaveDaySwr={leaveDay}
         />
-        <FileAttachMobile task={task} />
+        <FileAttach task={task} />
         <ApproverStep task={task} />
-        <Action_log_Mobile actionLog={task.data.actionLog} />
+        <Action_log actionLog={task.data.actionLog} />
       </div>
     );
   }

@@ -120,6 +120,7 @@ export default function Job_Pending(props: any) {
         headerTable={headerTable}
         loading={loading}
         data={realData}
+        
       />
     </div>
   );

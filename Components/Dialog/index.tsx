@@ -46,7 +46,7 @@ const RenderDialog = (props: {
   const actionDialogStore = useActionDialogStore();
   const handleClose = dialogStore.onCloseDialog;
   const { open, task, type, swrResponse } = { ...dialogStore };
-
+console.log('swrResponse 49',swrResponse)
   const user = _apiFn.useUser();
   const {
     handleSubmit,

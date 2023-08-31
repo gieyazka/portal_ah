@@ -87,7 +87,7 @@ const useMyTask = (data: {
 }) => {
   const myTask = useSWR(
     data.empid !== undefined && data.isFetch === true
-      ? [`/api/workflow/find_my_task`, data]
+      ? [`/api/workflow/custom_api/find_my_task`, data]
       : null,
     ([url, data]) => fetcherPost(url, data),
     {
@@ -97,6 +97,11 @@ const useMyTask = (data: {
       revalidateOnReconnect: false,
     }
   );
+  // const dataQuery = {
+  //   ...myTask,
+  //   data: _.orderBy(myTask.data, ["issueDate"], ["desc"]),
+  // };
+  // return dataQuery;
   return myTask;
 };
 
@@ -121,7 +126,7 @@ const useAction_logs = (data: { user: userData; filterStore: filterStore }) => {
   }
   const myTask = useSWR(
     data.user !== undefined && data.filterStore.isFetch === true
-      ? [`/api/workflow/find_action_logs`, data]
+      ? [`/api/workflow/custom_api/find_action_logs`, data]
       : null,
     ([url, data]) => fetcherPost(url, data),
     {
@@ -137,7 +142,7 @@ const useAction_logs = (data: { user: userData; filterStore: filterStore }) => {
 const useCurrentTask = (data: { user: userData; filterStore: filterStore }) => {
   const myTask = useSWR(
     data.user !== undefined && data.filterStore.isFetch === true
-      ? [`/api/workflow/find_user_approve`, data]
+      ? [`/api/workflow/custom_api/find_user_approve`, data]
       : null,
     ([url, data]) => fetcherPost(url, data),
     {
@@ -152,7 +157,7 @@ const useCurrentTask = (data: { user: userData; filterStore: filterStore }) => {
 //DONE
 const useTaskByItemID = (itemID: string | undefined) => {
   const myTask = useSWR(
-    itemID !== undefined ? [`/api/workflow/getTaskByItemID`, itemID] : null,
+    itemID !== undefined ? [`/api/workflow/custom_api/getTaskByItemID`, itemID] : null,
     ([url, data]) => fetcherPost(url, data),
     {
       refreshInterval: 600000,
@@ -300,8 +305,16 @@ const useLeaveDay = (site: string | undefined, type: string | undefined) => {
   // return { data: selectMachine, error, isLoading };
 };
 
+const getFileInfo = async (fileURL: string) => {
+  const res = await axios.get(
+    `/api/orgchart/upload/getFileDetail?filters[url]=${fileURL}`
+  );
+  return res.data[0];
+};
+
 const _apiFn = {
   signInStrapi,
+  getFileInfo,
   signOrgChart,
   getUserData,
   getLDAPData,

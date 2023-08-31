@@ -149,7 +149,6 @@ const RenderExportTable = ({
 
   // console.log("getInputProps", getInputProps());
   const [value, setValue] = React.useState<any>();
-  console.log("data", data);
   const arr = _.uniq(
     _.flatMap(data, (obj: { [key: string]: any }) => obj.data["flowName"])
   );
@@ -290,7 +289,7 @@ const RenderExportTable = ({
                   onClick={() => {
                     handleClickHeader(key, currentOrder);
                   }}
-                  className={`py-2 text-center  whitespace-nowrap cursor-pointer flex-1 font-medium ${
+                  className={`py-2 text-center  whitespace-nowrap cursor-pointer   font-medium ${
                     !key.width && "flex-1"
                   } `}
                   key={index}
@@ -329,16 +328,20 @@ const RenderExportTable = ({
               : data !== undefined && data.length > 0
               ? currentOrder.value === undefined
                 ? sliceData(handleFilter(data))
-                : _.orderBy(
-                    sliceData(handleFilter(data)),
-                    (item) =>
-                      eval(
-                        `item${commonJs.varString(
-                          currentOrder.value!.split(".")
-                        )}`
-                      ),
-                    //@ts-ignore
-                    [`${currentOrder.type!}`]
+                : sliceData(
+                    handleFilter(
+                      _.orderBy(
+                        data,
+                        (item) =>
+                          eval(
+                            `item${commonJs.varString(
+                              currentOrder.value!.split(".")
+                            )}`
+                          ),
+                        //@ts-ignore
+                        [`${currentOrder.type!}`]
+                      )
+                    )
                   )
               : []
             ).map((task: any, i: number) => (
@@ -397,7 +400,7 @@ const RenderExportTable = ({
                     return (
                       <div
                         key={i.toString() + index.toString()}
-                        className={`text-center flex-1 flex flex-col justify-center  ${
+                        className={`text-center  flex flex-col  justify-center  ${
                           !key.width && "flex-1"
                         }`}
                         style={{

@@ -139,7 +139,7 @@ const LeaveDetail = (props: {
                 />
               </div>
             </div>
-            <div className="flex flex-col whitespace-nowrap justify-center">
+            <div className="flex flex-col basis-2/5 justify-center">
               <Typography
                 className="text-[#EB4242] font-semibold text-lg "
                 component="p"

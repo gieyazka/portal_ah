@@ -177,7 +177,7 @@ const LeaveDetail = (props: {
                     className="text-[#464C59]  font-medium "
                     component="span"
                   >
-                    {dayjs(task.issueDate).format("HH:mm:SS")}
+                    {dayjs(task.issueDate).format("HH:mm:ss")}
                   </Typography>
                 </Typography>
                 <Typography

@@ -350,7 +350,7 @@ const onPreviewFile = async (file: string | Blob, type: string, storePreview: pr
     if (type === "pdf") {
         if (typeof file === "string") {
 
-            const res = await axios.get(`${process.env.NEXT_PUBLIC_Strapi}${file}`, {
+            const res = await axios.get(`/api/orgchart${file}`, {
                 responseType: "blob",
             });
             const pdfBlob = new Blob([res.data], {
@@ -363,6 +363,7 @@ const onPreviewFile = async (file: string | Blob, type: string, storePreview: pr
     }
 
     if (type === "image") {
+
         storePreview.onShowBackDrop(
             typeof file === "string" ? `${process.env.NEXT_PUBLIC_Strapi}${file}` : URL.createObjectURL(file),
             "image"
@@ -371,14 +372,21 @@ const onPreviewFile = async (file: string | Blob, type: string, storePreview: pr
     if (type === "file") {
         if (typeof file === "string") {
             var link = document.createElement("a");
-            link.setAttribute("href", `${process.env.NEXT_PUBLIC_Strapi}${file}`);
+            link.setAttribute("href", `/api/orgchart${file}`);
             link.click();
         }
     }
 };
 
+
+function objectToQueryString(obj: any) {
+    return Object.keys(obj)
+        .map(key => `${key}=${obj[key]}`)
+        .join('&');
+}
+
 const fn = {
-    callToast, onPreviewFile,
+    callToast, onPreviewFile, objectToQueryString,
     getStrName, varString, getNextApprover, isImageFile, checkString, useWidth, checkCanAction, getBase64, deleteImage, removeAttrFromStrapi
 }
 

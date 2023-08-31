@@ -86,7 +86,7 @@ export default function Action_log(props: any) {
       // color: "#F9FBFC",
       actionClick: ({ task, iconStyle }: { task: any; iconStyle?: string }) => {
         //@ts-ignore
-        dialogStore.onOpenDialog({ task, mytask });
+        dialogStore.onOpenDialog({ task, swrResponse: mytask });
       },
       component: ({ task, iconStyle }: { task: any; iconStyle?: string }) => {
         return (
@@ -107,7 +107,7 @@ export default function Action_log(props: any) {
   ];
   if (!viewStore.isMd) {
     return (
-      <div className="w-full mt-2">
+      <div className="w-full h-full">
         <Card_Mobile
           headerTable={headerTable}
           loading={mytask.isLoading}

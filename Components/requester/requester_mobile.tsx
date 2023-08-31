@@ -79,24 +79,7 @@ const Requester = (props: { requester: requester }) => {
                 </b>{" "}
                 {requester.empid}
               </Typography>
-              <Typography
-                component="p"
-                className="whitespace-nowrap overflow-hidden text-ellipsis"
-              >
-                <b
-                  style={{
-                    color: "#1D366D",
-                    fontFamily: " Bai Jamjuree",
-                    fontSize: "16px",
-                    fontStyle: "normal",
-                    fontWeight: 600,
-                    lineHeight: "170%",
-                  }}
-                >
-                  Position :
-                </b>{" "}
-                {requester.position}
-              </Typography>
+              
               <Typography component="p">
                 <b
                   style={{

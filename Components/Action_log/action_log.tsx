@@ -7,6 +7,7 @@ import {
   Typography,
 } from "@mui/material";
 import { Clear, Done, ExpandMore, PictureAsPdf } from "@mui/icons-material";
+import { approverList, previewStore } from "@/types/next-auth";
 import { usePreviewStore, useViewStore } from "@/store/store";
 
 import DownloadIcon from "@mui/icons-material/Download";
@@ -15,15 +16,19 @@ import FolderOffOutlinedIcon from "@mui/icons-material/FolderOffOutlined";
 import Image from "next/image";
 import ImageOutlinedIcon from "@mui/icons-material/ImageOutlined";
 import _ from "lodash";
-import { approverList } from "@/types/next-auth";
 import axios from "axios";
 import dayjs from "dayjs";
 import fn from "@/utils/common";
 
-const Action_log = (props: { actionLog: approverList[] | undefined }) => {
-  const actionLog = props.actionLog;
-  const storePreview = usePreviewStore();
-
+const Action_log = ({
+  actionLog,
+  storePreview,
+  fileState,
+}: {
+  actionLog: approverList[] | undefined;
+  storePreview: previewStore;
+  fileState: any;
+}) => {
   // console.log(actionLog);
   const viewStore = useViewStore();
   if (actionLog === undefined) {
@@ -164,8 +169,7 @@ const Action_log = (props: { actionLog: approverList[] | undefined }) => {
                       </Tooltip>
                     </div>
                     <div className=" w-[20%]  flex flex-col justify-center">
-                      {(approverData.filesURL === null ||
-                        approverData?.filesURL?.length === 0) && (
+                      {fileState === undefined && (
                         <div className="  flex-1 items-center gap-4 p-2">
                           <div className="m-auto  items-center flex text-center">
                             {/* <FolderOffOutlinedIcon className="" /> */}
@@ -183,54 +187,52 @@ const Action_log = (props: { actionLog: approverList[] | undefined }) => {
                           </div>
                         </div>
                       )}
-                      {approverData?.filesURL?.length !== 0 && (
+                      {fileState?.length !== 0 && (
                         <div className="m-auto gap-2 flex justify-center overflow-x-auto  w-full text-center">
-                          {approverData?.filesURL?.map(
-                            (file: string, index: number) => {
-                              const fileName = _.last(file.split("/"));
-                              let checkFile = fileName?.includes("pdf")
-                                ? "pdf"
-                                : fn.isImageFile(fileName as string)
-                                ? "image"
-                                : "file";
-                              return (
-                                <>
-                                  <Tooltip
-                                    key={`image${index}`}
-                                    title={fileName}
-                                    placement="top"
+                          {fileState?.map((file: any, index: number) => {
+                            const fileType = file.name;
+                            let checkFile = fileType?.includes(".pdf")
+                              ? "pdf"
+                              : fn.isImageFile(fileType as string)
+                              ? "image"
+                              : "file";
+                            return (
+                              <>
+                                <Tooltip
+                                  key={`image${index}`}
+                                  title={file.name}
+                                  placement="top"
+                                >
+                                  <div
+                                    onClick={() => {
+                                      fn.onPreviewFile(
+                                        file.name,
+                                        checkFile,
+                                        storePreview
+                                      );
+                                    }}
+                                    className="cursor-pointer  w-2/5  relative rounded-[10px]  flex gap-2 items-center "
                                   >
-                                    <div
-                                      onClick={() => {
-                                        fn.onPreviewFile(
-                                          file,
-                                          checkFile,
-                                          storePreview
-                                        );
-                                      }}
-                                      className="cursor-pointer  w-2/5  relative rounded-[10px]  flex gap-2 items-center "
-                                    >
-                                      <div className="ml-2 text-[#1D336D]">
-                                        {checkFile === "pdf" ? (
-                                          <PictureAsPdf className="    " />
-                                        ) : checkFile === "image" ? (
-                                          <ImageOutlinedIcon className=" " />
-                                        ) : (
-                                          <DownloadIcon className="  " />
-                                        )}
-                                      </div>
-                                      <Typography
-                                        component="p"
-                                        className=" text-[#000] text-sm truncate  py-2"
-                                      >
-                                        {fileName}
-                                      </Typography>
+                                    <div className="ml-2 text-[#1D336D]">
+                                      {checkFile === "pdf" ? (
+                                        <PictureAsPdf className="    " />
+                                      ) : checkFile === "image" ? (
+                                        <ImageOutlinedIcon className=" " />
+                                      ) : (
+                                        <DownloadIcon className="  " />
+                                      )}
                                     </div>
-                                  </Tooltip>
-                                </>
-                              );
-                            }
-                          )}
+                                    <Typography
+                                      component="p"
+                                      className=" text-[#000] text-sm truncate  py-2"
+                                    >
+                                      {file.name}
+                                    </Typography>
+                                  </div>
+                                </Tooltip>
+                              </>
+                            );
+                          })}
                         </div>
                       )}
                     </div>

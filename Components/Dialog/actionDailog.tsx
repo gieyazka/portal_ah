@@ -237,7 +237,7 @@ const RenderSubDialog = (props: {
               <div className="flex flex-wrap  ">
                 {fileForm.length > 0 &&
                   fileForm.map((fileData: fileData, index: number) => {
-                    let checkFile = fileData.name?.includes("pdf")
+                    let checkFile = fileData.name?.includes(".pdf")
                       ? "pdf"
                       : fn.isImageFile(fileData.name as string)
                       ? "image"

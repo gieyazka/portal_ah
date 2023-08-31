@@ -1,12 +1,7 @@
 {
   "compilerOptions": {
     "target": "es5",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext",
-      
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -21,9 +16,7 @@
     "incremental": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "./*"
-      ]
+      "@/*": ["./*"]
     },
     "plugins": [
       {
@@ -38,9 +31,14 @@
     "pages/logintest/index.jsx",
     "pages/apiTest/auth/[...nextauth].ts",
     "pages/apiTest/auth/[...nextauth].ts",
-    ".next/types/**/*.ts"
-, "app/page.ts", "app/login/page.jsx", "app/menu/my_task/page.tsx", "app/menu/my_action/page.tsx", "pdf-worker.js", "pages/api/workflow/approve.ts"  ],
-  "exclude": [
-    "node_modules"
-  ]
+    ".next/types/**/*.ts",
+    "app/page.ts",
+    "app/login/page.jsx",
+    "app/menu/my_task/page.tsx",
+    "app/menu/my_action/page.tsx",
+    "pdf-worker.js",
+    "pages/api/workflow/approve.ts",
+    "pages/api/orgchart/upload.js"
+  ],
+  "exclude": ["node_modules"]
 }

@@ -45,13 +45,7 @@ export default function SubComponent(props: any) {
   const lastPath = splitPath[splitPath.length - 1];
   const [value, setValue] = React.useState("1");
   const user = _apiFn.useUser();
-  const [dialogState, setDialogState] = React.useState<{
-    open: boolean;
-    task: { [key: string]: any } | undefined;
-  }>({
-    open: false,
-    task: undefined,
-  });
+
   const dialogStore = useDialogStore();
 
   const [realData, setRealData] = React.useState();
@@ -82,9 +76,6 @@ export default function SubComponent(props: any) {
       }
     }
   }, [mytask.data]);
-  const handleClickOpen = (task: {}) => {
-    setDialogState({ open: true, task: task });
-  };
 
   // React.useMemo(() => {
   //   if (filterStore.isFetch) {

@@ -218,9 +218,9 @@ const ApproverStep = (props: { task: task }) => {
             ) || undefined;
           return (
             <div key={`div${i}`}>
-              <p>{curPOs?.attributes?.position}</p>
               {task.data.currentApprover ? (
                 <>
+                 <p>{curPOs?.attributes?.position}</p>
                   {viewStore.isMd && (
                     <p>
                       {fn.checkString(

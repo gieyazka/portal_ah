@@ -42,7 +42,7 @@ const handler = (async (req, res) => {
         });
         return res.status(resData.status).json(resData.data)
     } else {
-        res.json({ message: 'Hello Everyone!' })
+        res.json({ message: 'Hello Everyone! Test' })
     }
 })
 export const config = {

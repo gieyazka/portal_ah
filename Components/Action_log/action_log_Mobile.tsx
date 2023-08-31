@@ -22,6 +22,7 @@ import {
   InsertDriveFile,
   PictureAsPdf,
 } from "@mui/icons-material";
+import { approverList, previewStore } from "@/types/next-auth";
 import { usePreviewStore, useViewStore } from "@/store/store";
 
 import DownloadIcon from "@mui/icons-material/Download";
@@ -30,37 +31,19 @@ import FolderOffOutlinedIcon from "@mui/icons-material/FolderOffOutlined";
 import Image from "next/image";
 import ImageOutlinedIcon from "@mui/icons-material/ImageOutlined";
 import _ from "lodash";
-import { approverList } from "@/types/next-auth";
 import axios from "axios";
 import dayjs from "dayjs";
 import fn from "@/utils/common";
 
-const Action_log = (props: { actionLog: approverList[] | undefined }) => {
-  const actionLog = props.actionLog;
-  const storePreview = usePreviewStore();
-  const handleClick = async (file: string, type: string) => {
-    if (type === "pdf") {
-      const res = await axios.get(`${process.env.NEXT_PUBLIC_Strapi}${file}`, {
-        responseType: "blob",
-      });
-      const pdfBlob = new Blob([res.data], {
-        type: "application/pdf",
-      });
-      storePreview.onShowBackDrop(pdfBlob, "pdf");
-    }
-
-    if (type === "image") {
-      storePreview.onShowBackDrop(
-        `${process.env.NEXT_PUBLIC_Strapi}${file}`,
-        "image"
-      );
-    }
-    if (type === "file") {
-      var link = document.createElement("a");
-      link.setAttribute("href", `${process.env.NEXT_PUBLIC_Strapi}${file}`);
-      link.click();
-    }
-  };
+const Action_log = ({
+  actionLog,
+  storePreview,
+  fileState,
+}: {
+  actionLog: approverList[] | undefined;
+  storePreview: previewStore;
+  fileState: any;
+}) => {
   // console.log(actionLog);
   const viewStore = useViewStore();
   if (actionLog === undefined) {
@@ -174,8 +157,7 @@ const Action_log = (props: { actionLog: approverList[] | undefined }) => {
                         </Tooltip>
                       </div>
                       <div className="flex-1 w-[calc(100%_-_1.25rem)] overflow-x-auto  flex flex-col ">
-                        {(approverData.filesURL === null ||
-                          approverData?.filesURL?.length === 0) && (
+                        {fileState === undefined && (
                           <div className="  flex-1 items-center gap-4 ">
                             <div className="m-auto  flex ">
                               {/* <FolderOffOutlinedIcon className="" /> */}
@@ -186,21 +168,25 @@ const Action_log = (props: { actionLog: approverList[] | undefined }) => {
                             </div>
                           </div>
                         )}
-                        {approverData?.filesURL?.length !== 0 && (
+                        {fileState?.length !== 0 && (
                           <div className=" gap-2 flex   w-full text-center">
                             {approverData?.filesURL?.map(
-                              (file: string, index: number) => {
-                                const fileName = _.last(file.split("/"));
-                                let checkFile = fileName?.includes("pdf")
+                              (file: any, index: number) => {
+                                const fileType = file.name;
+                                let checkFile = fileType?.includes(".pdf")
                                   ? "pdf"
-                                  : fn.isImageFile(fileName as string)
+                                  : fn.isImageFile(fileType as string)
                                   ? "image"
                                   : "file";
                                 return (
                                   <>
                                     <div
                                       onClick={() => {
-                                        handleClick(file, checkFile);
+                                        fn.onPreviewFile(
+                                          file.name,
+                                          checkFile,
+                                          storePreview
+                                        );
                                       }}
                                       className="cursor-pointer    relative rounded-[10px] w-full  flex gap-2 items-center "
                                     >
@@ -217,7 +203,7 @@ const Action_log = (props: { actionLog: approverList[] | undefined }) => {
                                         component="p"
                                         className=" text-[#000] text-sm truncate  my-2"
                                       >
-                                        {fileName}
+                                        {file.name}
                                       </Typography>
                                     </div>
                                   </>

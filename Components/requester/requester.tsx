@@ -26,102 +26,86 @@ const Requester = (props: { requester: requester }) => {
               <User size="32" color="#464C59" />
             </Avatar>
           </div>
-          <div className="basis-[35%] whitespace-nowrap">
-            <Typography component="p">
-              <b
-                style={{
-                  color: "#1D366D",
-                  fontFamily: " Bai Jamjuree",
-                  fontSize: "16px",
-                  fontStyle: "normal",
-                  fontWeight: 600,
-                  lineHeight: "170%",
-                }}
-              >
-                Name :
-              </b>{" "}
-              {requester.name}
-            </Typography>
-            <Typography component="p">
-              <b
-                style={{
-                  color: "#1D366D",
-                  fontFamily: " Bai Jamjuree",
-                  fontSize: "16px",
-                  fontStyle: "normal",
-                  fontWeight: 600,
-                  lineHeight: "170%",
-                }}
-              >
-                Employee ID :
-              </b>{" "}
-              {requester.empid}
-            </Typography>
-            <Typography
-              component="p"
-              className="whitespace-nowrap overflow-hidden text-ellipsis"
-            >
-              <b
-                style={{
-                  color: "#1D366D",
-                  fontFamily: " Bai Jamjuree",
-                  fontSize: "16px",
-                  fontStyle: "normal",
-                  fontWeight: 600,
-                  lineHeight: "170%",
-                }}
-              >
-                Position :
-              </b>{" "}
-              {requester.position}
-            </Typography>
-          </div>
-          <div className="basis-[35%] whitespace-nowrap">
-            <Typography component="p">
-              <b
-                style={{
-                  color: "#1D366D",
-                  fontFamily: " Bai Jamjuree",
-                  fontSize: "16px",
-                  fontStyle: "normal",
-                  fontWeight: 600,
-                  lineHeight: "170%",
-                }}
-              >
-                Company :
-              </b>{" "}
-              {requester.company}
-            </Typography>
-            <Typography component="p">
-              <b
-                style={{
-                  color: "#1D366D",
-                  fontFamily: " Bai Jamjuree",
-                  fontSize: "16px",
-                  fontStyle: "normal",
-                  fontWeight: 600,
-                  lineHeight: "170%",
-                }}
-              >
-                Employee ID :
-              </b>{" "}
-              {requester.department}
-            </Typography>
-            <Typography component="p">
-              <b
-                style={{
-                  color: "#1D366D",
-                  fontFamily: " Bai Jamjuree",
-                  fontSize: "16px",
-                  fontStyle: "normal",
-                  fontWeight: 600,
-                  lineHeight: "170%",
-                }}
-              >
-                Section :
-              </b>{" "}
-              {requester.section}
-            </Typography>
+          <div className='flex gap-2'>
+            <div className="basis-[35%] whitespace-nowrap">
+              <Typography component="p">
+                <b
+                  style={{
+                    color: "#1D366D",
+                    fontFamily: " Bai Jamjuree",
+                    fontSize: "16px",
+                    fontStyle: "normal",
+                    fontWeight: 600,
+                    lineHeight: "170%",
+                  }}
+                >
+                  Name :
+                </b>{" "}
+                {requester.name}
+              </Typography>
+              <Typography component="p">
+                <b
+                  style={{
+                    color: "#1D366D",
+                    fontFamily: " Bai Jamjuree",
+                    fontSize: "16px",
+                    fontStyle: "normal",
+                    fontWeight: 600,
+                    lineHeight: "170%",
+                  }}
+                >
+                  Employee ID :
+                </b>{" "}
+                {requester.empid}
+              </Typography>
+            </div>
+            <div className="basis-[35%] whitespace-nowrap">
+              <Typography component="p">
+                <b
+                  style={{
+                    color: "#1D366D",
+                    fontFamily: " Bai Jamjuree",
+                    fontSize: "16px",
+                    fontStyle: "normal",
+                    fontWeight: 600,
+                    lineHeight: "170%",
+                  }}
+                >
+                  Company :
+                </b>{" "}
+                {requester.company}
+              </Typography>
+              <Typography component="p">
+                <b
+                  style={{
+                    color: "#1D366D",
+                    fontFamily: " Bai Jamjuree",
+                    fontSize: "16px",
+                    fontStyle: "normal",
+                    fontWeight: 600,
+                    lineHeight: "170%",
+                  }}
+                >
+                  Employee ID :
+                </b>{" "}
+                {requester.department}
+              </Typography>
+              <Typography component="p">
+                <b
+                  style={{
+                    color: "#1D366D",
+                    fontFamily: " Bai Jamjuree",
+                    fontSize: "16px",
+                    fontStyle: "normal",
+                    fontWeight: 600,
+                    lineHeight: "170%",
+                  }}
+                >
+                  Section :
+                </b>{" "}
+                {requester.section ?? "-"}
+              </Typography>
+            </div>
           </div>
         </div>
       </div>

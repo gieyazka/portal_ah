@@ -53,6 +53,7 @@ const RenderExportTable = ({
   loading,
   data,
   subpath,
+  
 }: {
   headerTable: headerTable[];
   loading: boolean;
@@ -328,16 +329,20 @@ const RenderExportTable = ({
               : data !== undefined && data.length > 0
               ? currentOrder.value === undefined
                 ? sliceData(handleFilter(data))
-                : _.orderBy(
-                    sliceData(handleFilter(data)),
-                    (item) =>
-                      eval(
-                        `item${commonJs.varString(
-                          currentOrder.value!.split(".")
-                        )}`
-                      ),
-                    //@ts-ignore
-                    [`${currentOrder.type!}`]
+                : sliceData(
+                    handleFilter(
+                      _.orderBy(
+                        data,
+                        (item) =>
+                          eval(
+                            `item${commonJs.varString(
+                              currentOrder.value!.split(".")
+                            )}`
+                          ),
+                        //@ts-ignore
+                        [`${currentOrder.type!}`]
+                      )
+                    )
                   )
               : []
             ).map((task: any, i: number) => (
@@ -447,7 +452,7 @@ const RenderExportTable = ({
                     return (
                       <div
                         key={i.toString() + index.toString()}
-                        className={`text-center   flex flex-col justify-center  ${
+                        className={`text-center   flex  flex-col  justify-center  ${
                           !key.width && "flex-1"
                         }`}
                         style={{

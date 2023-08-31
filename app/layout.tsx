@@ -29,8 +29,8 @@ export default function RootLayout({
   const viewStore = useViewStore();
   return (
     <html style={{ height: "100vh" }}>
-        <title>
-          E-Workflow Portal</title>
+
+      {/* <title> E-Workflow Portal</title> */}
       <body style={{ fontFamily: "Bai Jamjuree" }}>
         <Providers>
           {/* <> */}

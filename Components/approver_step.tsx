@@ -248,19 +248,18 @@ const ApproverStep = (props: { task: task }) => {
     // console.log("nextAppover", nextAppover);
     return (
       <div>
-        <p>{curPOs ? curPOs?.attributes?.position : nextAppover.level}</p>
+     
         {task.data.currentApprover ? (
           <>
-            {viewStore.isMd && (
-              <p>
-                {fn.checkString(nextAppover.section, undefined, "")}
-                {fn.checkString(nextAppover.company, undefined, ":")}
+             <p>{curPOs ? curPOs?.attributes?.position : nextAppover.level}</p>
+            <p>
+              {fn.checkString(nextAppover.section, undefined, "")}
+              {fn.checkString(nextAppover.company, undefined, ":")}
 
-                {fn.checkString(nextAppover.department, undefined, ":")}
+              {fn.checkString(nextAppover.department, undefined, ":")}
 
-                {fn.checkString(nextAppover.sub_section, undefined, ":")}
-              </p>
-            )}
+              {fn.checkString(nextAppover.sub_section, undefined, ":")}
+            </p>
           </>
         ) : (
           <p>Wait for Resend</p>
@@ -452,7 +451,7 @@ const ApproverStep = (props: { task: task }) => {
     <>
       {task !== undefined && (
         <Stepper
-          className="overflow-x-auto w-auto font-[Bai Jamjuree]"
+          className=" w-auto font-[Bai Jamjuree]"
           activeStep={current}
           alternativeLabel
           connector={<ColorlibConnector />}

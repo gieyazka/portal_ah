@@ -1,24 +1,29 @@
 import { ArrowRight, FolderCross, User } from "iconsax-react";
 import { Avatar, Tooltip, Typography } from "@mui/material";
-import { requester, task } from "@/types/next-auth";
+import { previewStore, requester, task } from "@/types/next-auth";
 
-import ApproverStep from "./approver_step";
+import ApproverStep from "../approver_step";
 import DownloadIcon from "@mui/icons-material/Download";
 import FolderOffOutlinedIcon from "@mui/icons-material/FolderOffOutlined";
 import Image from "next/image";
 import ImageOutlinedIcon from "@mui/icons-material/ImageOutlined";
 import { PictureAsPdf } from "@mui/icons-material";
+import React from "react";
 import _ from "lodash";
+import _apiFn from "@/utils/apiFn";
 import axios from "axios";
 import dayjs from "dayjs";
 import fn from "@/utils/common";
 import { usePreviewStore } from "@/store/store";
 
-const Requester = (props: { task: task }) => {
-  const storePreview = usePreviewStore();
-  const task = props.task;
-  const requester = task.data.requester;
-
+const FileAttached = ({
+  fileState,
+  storePreview,
+}: {
+  fileState: any;
+  storePreview: previewStore;
+}) => {
+  console.log("fileState", fileState);
   return (
     <div className="  w-full h-full relative">
       <div
@@ -34,40 +39,43 @@ const Requester = (props: { task: task }) => {
           File attached
         </Typography>
 
-        {task.data.filesURL === undefined ||
-          (task.data.filesURL.length === 0 && (
-            <div className="flex  flex-col flex-1 items-center gap-4 m-4  ">
-              <div className="m-auto  text-center">
-                {/* <FolderOffOutlinedIcon className="w-[12vh] h-[12vh]" /> */}
-                <FolderCross size="48" className="mx-auto" color="#818181" />
-                <Typography
-                  component="p"
-                  className="text-xl  text-[#818181] font-semibold"
-                >
-                  No file attached
-                </Typography>
-              </div>
+        {(fileState === undefined || fileState.length === 0) && (
+          <div className="flex  flex-col flex-1 items-center flex-wrap gap-4 m-4  ">
+            <div className="m-auto  text-center">
+              {/* <FolderOffOutlinedIcon className="w-[12vh] h-[12vh]" /> */}
+              <FolderCross size="48" className="mx-auto" color="#818181" />
+              <Typography
+                component="p"
+                className="text-xl  text-[#818181] font-semibold"
+              >
+                No file attached
+              </Typography>
             </div>
-          ))}
-        {task.data.filesURL !== undefined && task.data.filesURL.length > 0 && (
+          </div>
+        )}
+        {fileState !== undefined && fileState.length > 0 && (
           <div className="flex flex-col flex-1 p-4 overflow-y-auto   ">
-            <div className=" flex   flex-wrap gap-2 basis-[33%]  ">
-              {task.data.filesURL.map((file: string, index: number) => {
-                const fileName = _.last(file.split("/"));
-                let checkFile = fileName?.includes("pdf")
+            <div className=" flex   flex-wrap gap-4 basis-[33%]  ">
+              {fileState.map((file: any, index: number) => {
+                const fileType = file.name;
+                let checkFile = fileType?.includes(".pdf")
                   ? "pdf"
-                  : fn.isImageFile(fileName as string)
+                  : fn.isImageFile(fileType as string)
                   ? "image"
                   : "file";
                 return (
                   <Tooltip
                     key={`image${index}`}
-                    title={fileName}
+                    title={file.name}
                     placement="top"
                   >
                     <div
                       onClick={async () => {
-                        await fn.onPreviewFile(file, checkFile, storePreview);
+                        await fn.onPreviewFile(
+                          file.url,
+                          checkFile,
+                          storePreview
+                        );
                       }}
                       className="cursor-pointer bg-[#F5F5F5] relative rounded-[10px] w-[31%] flex   gap-2 items-center justify-between"
                     >
@@ -84,7 +92,7 @@ const Requester = (props: { task: task }) => {
                         component="p"
                         className=" text-[#818181] text-sm truncate  basis-[60%]  py-2"
                       >
-                        {fileName}
+                        {file.name}
                       </Typography>
                       <ArrowRight
                         size="24"
@@ -103,4 +111,4 @@ const Requester = (props: { task: task }) => {
   );
 };
 
-export default Requester;
+export default FileAttached;

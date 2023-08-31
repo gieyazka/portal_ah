@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 
 import axios from 'axios'
+import fn from "@/utils/common";
 
 export default async function handler(
     req: NextApiRequest,
@@ -11,6 +12,7 @@ export default async function handler(
     //     res.status(405).send({ message: 'Only POST requests allowed' })
     //     return
     // }
+    // console.log(' req.query', req.query)
     if (req.method === 'POST') {
         const { path } = req.query
         const data = req.body
@@ -19,10 +21,12 @@ export default async function handler(
         )
         res.status(resTask.status).json(resTask.data)
     } else {
-        const { path } = req.query
-        
-        const resTask = await axios.get(`${process.env.NEXT_PUBLIC_Strapi}/api/${path}`)
+
+        const { path, ...query } = req.query
+        const newQuery = fn.objectToQueryString(query)
+        const resTask = await axios.get(`${process.env.NEXT_PUBLIC_Strapi}/api/${path}?${newQuery}`)
         res.status(resTask.status).json(resTask.data)
 
     }
 }
+

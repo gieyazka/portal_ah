@@ -2,8 +2,7 @@ import { previewStore, task } from "@/types/next-auth";
 import { usePreviewStore, useViewStore } from "@/store/store";
 
 import ApproverStepMobile from "../approver_step_Mobile";
-import FileAttach from "../fileAttached";
-import FileAttachMobile from "../fileAttached_Mobile";
+import FileAttach from "../FileAttached/";
 import Image from "next/image";
 import LeaveDetail from "./leaveflow";
 import LeaveDetailMobile from "./leaveflow_Mobile";
@@ -62,7 +61,7 @@ const Leave_Flow = (props: {
           storePreview={storePreview}
           leaveDaySwr={leaveDay}
         />
-        <FileAttachMobile task={task} />
+        <FileAttach task={task} />
       </div>
     );
   }

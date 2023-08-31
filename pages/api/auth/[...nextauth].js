@@ -134,8 +134,7 @@ export const authOptions = {
                 token.position = data.employee.position ?? null
                 //custom agr add here then ass in session
                 if (data.hierachy === null) {
-                    const resLdap = await _fnApi.getLDAPData(data.employee.email.split("@"))
-                    console.log('resLdap',resLdap.data)
+                    const resLdap = await _fnApi.getLDAPData(data.employee.email)
                     token.department = resLdap.data?.employee?.department ?? null
                     token.company = resLdap.data.employee?.company ?? null
                 }
