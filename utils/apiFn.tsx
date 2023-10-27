@@ -77,16 +77,27 @@ const useUser = () => {
   });
   return user;
 };
+const useHrSetting = (isFetch: boolean) => {
+  const hrSetting = useSWRImmutable(
+    isFetch ? `/api/workflow/custom_api/getHRLeaveSetting` : null,
+    fetcher,
+    {
+      refreshInterval: 600000,
+    }
+  );
+  return hrSetting;
+};
 //DONE
 const useMyTask = (data: {
-  empid: string;
+  email?: string;
+  empid?: string;
   status: string;
   startDate: Dayjs;
   endDate: Dayjs;
   isFetch: boolean;
 }) => {
   const myTask = useSWR(
-    data.empid !== undefined && data.isFetch === true
+    data.email !== undefined
       ? [`/api/workflow/custom_api/find_my_task`, data]
       : null,
     ([url, data]) => fetcherPost(url, data),
@@ -124,9 +135,11 @@ const useAction_logs = (data: { user: userData; filterStore: filterStore }) => {
   if (data.user) {
     delete data.user.jwt;
   }
+  const { startDate, endDate } = data.filterStore;
+  const newData = { user: data.user, filterStore: { startDate, endDate } };
   const myTask = useSWR(
-    data.user !== undefined && data.filterStore.isFetch === true
-      ? [`/api/workflow/custom_api/find_action_logs`, data]
+    data.user !== undefined
+      ? [`/api/workflow/custom_api/find_action_logs`, newData]
       : null,
     ([url, data]) => fetcherPost(url, data),
     {
@@ -140,9 +153,11 @@ const useAction_logs = (data: { user: userData; filterStore: filterStore }) => {
 };
 //DONE
 const useCurrentTask = (data: { user: userData; filterStore: filterStore }) => {
+  const { startDate, endDate } = data.filterStore;
+  const newData = { user: data.user, filterStore: { startDate, endDate } };
   const myTask = useSWR(
-    data.user !== undefined && data.filterStore.isFetch === true
-      ? [`/api/workflow/custom_api/find_user_approve`, data]
+    data.user !== undefined
+      ? [`/api/workflow/custom_api/find_user_approve`, newData]
       : null,
     ([url, data]) => fetcherPost(url, data),
     {
@@ -154,10 +169,45 @@ const useCurrentTask = (data: { user: userData; filterStore: filterStore }) => {
   );
   return myTask;
 };
+const useCarbookingTask = (data: { user: userData }) => {
+  const carBookingTask = useSWR(
+    data.user === undefined
+      ? null
+      : `https://ess.aapico.com/bookings?status=free&managerApprove_null=true&managerEmail=${data.user.email}`,
+    fetcher,
+    {
+      refreshInterval: 600000,
+      // revalidateIfStale: false,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+    }
+  );
+  if (carBookingTask.data !== undefined) {
+    carBookingTask.data.forEach((data: any) => {
+      data["issueDate"] = dayjs(data.created_at).toISOString();
+      data["task_id"] = data.id;
+      data.data = {
+        flowName: "Car Booking",
+        reason: data.reason,
+
+        requester: {
+          empid: data.user,
+          name: data.name,
+          company: data.company,
+          department: data.department,
+        },
+        status: data.status === "free" ? "Waiting" : data.status,
+      };
+    });
+  }
+  return carBookingTask;
+};
 //DONE
 const useTaskByItemID = (itemID: string | undefined) => {
   const myTask = useSWR(
-    itemID !== undefined ? [`/api/workflow/custom_api/getTaskByItemID`, itemID] : null,
+    itemID !== undefined
+      ? [`/api/workflow/custom_api/getTaskByItemID`, itemID]
+      : null,
     ([url, data]) => fetcherPost(url, data),
     {
       refreshInterval: 600000,
@@ -244,55 +294,7 @@ const actionJob = async (
   // });
   return res;
 };
-// const emailApprove = async (
-//   taskID: string,
-//   field: string,
-//   fieldData: any,
-//   formData: any
-// ) => {
-//   let data: any = {
-//     task_id: taskID,
-//     field: field,
-//     fieldData: fieldData,
-//     // formData,
-//   };
-//   let send_formData = new FormData();
-//   data["haveFile"] = false;
-//   for (const key in formData) {
-//     if (Object.prototype.hasOwnProperty.call(formData, key)) {
-//       const element = formData[key];
-//       if (key === "file") {
-//         if (element.length > 0) {
-//           element.forEach((fileData: any) => {
-//             send_formData.append(`files`, fileData.file, fileData.name);
-//           });
-//           data["haveFile"] = true;
-//         }
-//       } else {
-//         data[key] = element;
-//       }
-//     }
-//   }
-//   send_formData.append("data", JSON.stringify(data));
-//   // console.log(data);
-//   // console.log(formData);
 
-//   const res = await axios({
-//     method: "post",
-//     url: `/api/workflow/approve/`,
-//     data: send_formData,
-//     headers: { "Content-Type": "multipart/form-data" },
-//   });
-//   // const res = await axios({
-//   //   method: "post",
-//   //   url: `${process.env.NEXT_PUBLIC_WORKFLOW_URL}/api/engine/invoke/`,
-//   //   data: send_formData,
-//   //   headers: { "Content-Type": "multipart/form-data" },
-//   // });
-//   return res;
-// };
-
-//์from Ess
 const useLeaveDay = (site: string | undefined, type: string | undefined) => {
   const leaveday = useSWRImmutable(
     site === undefined
@@ -309,6 +311,9 @@ const getFileInfo = async (fileURL: string) => {
   const res = await axios.get(
     `/api/orgchart/upload/getFileDetail?filters[url]=${fileURL}`
   );
+  if (res.data[0] === undefined) {
+    return { name: "File Error", isError: true };
+  }
   return res.data[0];
 };
 
@@ -319,9 +324,11 @@ const _apiFn = {
   getUserData,
   getLDAPData,
   useUser,
+  useHrSetting,
   useMyTask,
   getMyLevels,
   useCurrentTask,
+  useCarbookingTask,
   useTaskByItemID,
   actionJob,
   usePosition,

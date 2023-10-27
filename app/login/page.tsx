@@ -63,6 +63,13 @@ export default function SignIn({}) {
       password: "",
     },
   });
+
+  React.useEffect(() => {
+    getProviders().then((d) => {
+      console.log("provider", d);
+    });
+  });
+
   React.useEffect(() => {
     const remember = localStorage.getItem("userRemember") ?? null;
     if (remember) {
@@ -156,7 +163,7 @@ export default function SignIn({}) {
         <div className="w-[5.95rem] h-[5.95rem] rounded-full bg-transparent absolute left-[4.5rem] bottom-[3.875rem] border-[#1D336D] border-[0.625rem]"></div>
         <div className="bg-[#8F94B4] w-[1rem] h-[1rem]  rounded-full absolute bottom-[1.75rem] right-[6rem] -translate-x-1/2 "></div>
         <div className="w-[10.75rem] h-[10.75rem] rounded-full bg-transparent absolute -right-[5.5rem] -bottom-[5.25rem] border-[#475384] border-[1.25rem]"></div>
-        <div className="text-center w-[21.5rem] h-auto bg-[#EEF1F8] rounded-[20px] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+        <div className="text-center w-[22.5rem] h-auto bg-[#EEF1F8] rounded-[20px] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 ">
           {/* h-[36.5rem */}
           <Image
             className=" relative mx-auto items-center mt-[2.25rem]
@@ -168,92 +175,61 @@ export default function SignIn({}) {
             height={56}
           />
           <Typography
-            className="text-3xl mt-[2.125rem]  font-bold text-[#1D336D] "
+            className="text-3xl mt-[4px]  font-bold text-[#1D336D] "
+            component="p"
+          >
+            Sign In
+          </Typography>
+          <Typography
+            className="text-2xl mt-[4px]  font-bold text-[#1D336D] "
             component="p"
           >
             E-WorkFlow Portal
           </Typography>
-          <Typography component="p" className="text-[#818181] mt-2">
+
+          <div className="flex gap-2">
+            <Button
+              variant="contained"
+              className="bg-[#1D336D] px-6 mx-auto rounded-[32px] text-xl font-semibold"
+              sx={{ mt: 3, mb: 2, width: 124 }}
+              onClick={async () => {
+                let response = await signIn("azure-ad-AH", {
+                  redirect: false,
+                  callbackUrl: "/menu/my_action?current=job_pending",
+                  // callbackUrl: "/menu/my_task?current=in_process",
+                })
+                  .then((res) => res)
+                  .catch((error) => {
+                    console.log("error", error);
+                    return error;
+                  });
+              }}
+            >
+              AAPICO
+            </Button>
+            <Button
+              variant="contained"
+              className="bg-[#1D336D] px-6 mx-auto rounded-[32px] text-xl font-semibold"
+              sx={{ mt: 3, mb: 2, width: 124 }}
+              onClick={async () => {
+                let response = await signIn("azure-ad-AS", {
+                  redirect: false,
+                  callbackUrl: "/menu/my_action?current=job_pending",
+                  // callbackUrl: "/menu/my_task?current=in_process",
+                })
+                  .then((res) => res)
+                  .catch((error) => {
+                    console.log("error", error);
+                    return error;
+                  });
+              }}
+            >
+              ASICO
+            </Button>
+          </div>
+          <Typography component="p" className="text-[#818181] my-3">
             <Copyright sx={{}} /> Copyright AAPICO 2023
           </Typography>
-          {/* <form
-            onSubmit={handleSubmit(onLogin)}
-            className="w-full mt-[2.375rem]  text-left"
-            suppressHydrationWarning
-          >
-            <div className="mx-6">
-              <label
-                htmlFor="username"
-                className="text-left font-[Bai Jamjuree] text-[#464C59] text-base font-semibold ml-4"
-              >
-                Ldap User
-              </label>
-              <input
-                {...register("username")}
-                className="px-3 h-12 w-[18.375rem] bg-white rounded-[5px] "
-                style={{ boxShadow: "4px 4px 10px 0px rgba(0, 0, 0, 0.15)" }}
-                id="username"
-              />
-            </div>
-            <div className="mx-6 mt-5">
-              <label
-                htmlFor="password"
-                className=" font-[Bai Jamjuree] text-[#464C59] text-base font-semibold ml-4 mt-5"
-              >
-                Password
-              </label>
-              <input
-                {...register("password")}
-                type="password"
-                className="px-3 h-12 w-[18.375rem] bg-white rounded-[5px]  "
-                style={{ boxShadow: "4px 4px 10px 0px rgba(0, 0, 0, 0.15)" }}
-                id="username"
-              />
-            </div>
-            <div className="mx-3 mt-5">
-              <Controller
-                name="remember"
-                control={control}
-                render={({ field }) => (
-                  <FormControlLabel
-                    className="ml-4 text-[#64C59] font-medium font-[Bai Jamjuree]"
-                    control={<Checkbox {...field} checked={field.value} />}
-                    label="Remember me"
-                  />
-                )}
-              />
-            </div>
-            <div className="text-center">
-              <Button
-                type="submit"
-                variant="contained"
-                className="bg-[#1D336D]  w-36 h-12 rounded-[32px] mt=[3.375rem]"
-                sx={{ mt: 3, mb: 2 }}
-                // onClick={() =>
-                //   onLogin(getValue())
-                // }
-              >
-                Sign In
-              </Button>
-            
-            </div>
-          </form> */}
-          <Button
-            variant="contained"
-            className="bg-[#1D336D] px-8 mx-auto rounded-[32px] text-xl font-semibold"
-            sx={{ mt: 3, mb: 2, width: 256 }}
-            onClick={async () => {
-              let response = await signIn("azure-ad", {
-                redirect: false,
-                callbackUrl: "/menu/my_action?current=job_pending",
-                // callbackUrl: "/menu/my_task?current=in_process",
-              })
-                .then((res) => res)
-                .catch((error) => error);
-            }}
-          >
-            Sign In
-          </Button>
         </div>
       </div>
     );
@@ -386,113 +362,56 @@ export default function SignIn({}) {
           </div>
         </div>
         <div className="flex flex-col  gap-2 items-center justify-center shadow-md h-full flex-1 px-24 ">
+          <Typography className="font-bold text-4xl">Sign In</Typography>
           <Typography
             component="p"
-            className="text-bold text-4xl text-[#1D336D]"
+            className="text-bold text-3xl text-[#1D336D]"
           >
             E-Workflow Portal
           </Typography>
-
+          <div className="flex gap-4">
+            <Button
+              variant="contained"
+              className="bg-[#1D336D] px-6 mx-auto rounded-[32px] text-xl font-semibold"
+              sx={{ mt: 3, mb: 2, width: 224 }}
+              onClick={async () => {
+                let response = await signIn("azure-ad-AH", {
+                  redirect: false,
+                  callbackUrl: "/menu/my_action?current=job_pending",
+                  // callbackUrl: "/menu/my_task?current=in_process",
+                })
+                  .then((res) => res)
+                  .catch((error) => {
+                    console.log("error", error);
+                    return error;
+                  });
+              }}
+            >
+              AAPICO
+            </Button>
+            <Button
+              variant="contained"
+              className="bg-[#1D336D] px-6 mx-auto rounded-[32px] text-xl font-semibold"
+              sx={{ mt: 3, mb: 2, width: 224 }}
+              onClick={async () => {
+                let response = await signIn("azure-ad-AS", {
+                  redirect: false,
+                  callbackUrl: "/menu/my_action?current=job_pending",
+                  // callbackUrl: "/menu/my_task?current=in_process",
+                })
+                  .then((res) => res)
+                  .catch((error) => {
+                    console.log("error", error);
+                    return error;
+                  });
+              }}
+            >
+              ASICO
+            </Button>
+          </div>
           <Typography component="p" className="text-[#818181]">
             <Copyright sx={{}} /> Copyright AAPICO 2023
           </Typography>
-
-          {/* <form
-            onSubmit={handleSubmit(onLogin)}
-            className="flex flex-col w-full "
-            suppressHydrationWarning
-          >
-            <Controller
-              control={control}
-              name="username"
-              render={({ field: { onChange, onBlur, value, ref } }) => (
-                <TextField
-                  style={{
-                    borderRadius: "10px",
-                    opacity: 0.6,
-                    background: "#FFF",
-                    boxShadow: "4px 4px 10px 0px rgba(0, 0, 0, 0.15)",
-                  }}
-                  margin="normal"
-                  fullWidth
-                  id="username"
-                  label="Ldap User"
-                  name="username"
-                  autoComplete="username"
-                  autoFocus
-                  onChange={onChange} // send value to hook form
-                  onBlur={onBlur} // notify when input is touched/blur
-                  value={value}
-                />
-              )}
-            />
-
-            <Controller
-              control={control}
-              name="password"
-              render={({ field: { onChange, onBlur, value, ref } }) => (
-                <TextField
-                  margin="normal"
-                  required
-                  fullWidth
-                  name="password"
-                  label="Password"
-                  type="password"
-                  id="password"
-                  autoComplete="current-password"
-                  onChange={onChange}
-                  onBlur={onBlur}
-                  value={value}
-                  style={{
-                    borderRadius: "10px",
-                    opacity: 0.6,
-                    background: "#FFF",
-                    boxShadow: "4px 4px 10px 0px rgba(0, 0, 0, 0.15)",
-                  }}
-                />
-              )}
-            />
-
-            <Controller
-              name="remember"
-              control={control}
-              render={({ field }) => (
-                <FormControlLabel
-                  className="ml-4"
-                  control={<Checkbox {...field} checked={field.value} />}
-                  label="Remember me"
-                />
-              )}
-            />
-            <br />
-            <Button
-              type="submit"
-              variant="contained"
-              className="bg-[#1D336D] px-8 mx-auto rounded-[32px]"
-              sx={{ mt: 3, mb: 2 }}
-              // onClick={() =>
-              //   onLogin(getValue())
-              // }
-            >
-              Sign In
-            </Button>
-          </form> */}
-          <Button
-            variant="contained"
-            className="bg-[#1D336D] px-8 mx-auto rounded-[32px] text-xl font-semibold"
-            sx={{ mt: 3, mb: 2, width: 256 }}
-            onClick={async () => {
-              let response = await signIn("azure-ad", {
-                redirect: false,
-                callbackUrl: "/menu/my_action?current=job_pending",
-                // callbackUrl: "/menu/my_task?current=in_process",
-              })
-                .then((res) => res)
-                .catch((error) => error);
-            }}
-          >
-            Sign In
-          </Button>
         </div>
       </div>{" "}
     </>

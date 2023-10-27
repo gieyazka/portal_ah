@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 
 import LinearProgress from "@mui/material/LinearProgress";
 import Snackbar from "@mui/material/Snackbar";
+import { Typography } from "@mui/material";
 import { useSnackbarStore } from "@/store/store";
 
 function Alert(props: AlertProps) {
@@ -18,7 +19,7 @@ const CountdownSnackbar = () => {
     if (snackbarStore.open && countdown > 0) {
       timer = setTimeout(() => {
         setCountdown(countdown - 0.1);
-        setProgress((countdown - 0.1) * 100/20); // Adjust based on the total countdown duration
+        setProgress(((countdown - 0.1) * 100) / 20); // Adjust based on the total countdown duration
       }, 100);
       if (countdown.toFixed(1) === "0.1") {
         handleClose();
@@ -48,11 +49,15 @@ const CountdownSnackbar = () => {
           onClose={handleClose}
           severity={snackbarStore.type}
         >
-          {snackbarStore.message}
+          <div>
+            <Typography component="p">{snackbarStore.title}</Typography>
+            <Typography component="p">{snackbarStore.message}</Typography>
+          </div>
         </Alert>
         <LinearProgress
           sx={{
-            borderBottomLeftRadius: '25px', borderBottomRightRadius: '25px' ,
+            borderBottomLeftRadius: "25px",
+            borderBottomRightRadius: "25px",
             padding: 0,
             backgroundColor: "green",
             "& .MuiLinearProgress-bar": {

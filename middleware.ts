@@ -3,9 +3,11 @@ import { NextResponse } from 'next/server'
 import { withAuth } from "next-auth/middleware"
 
 export default withAuth(
+    
     // `withAuth` augments your `Request` with the user's token.
     function middleware(req) {
         if (req.nextUrl.pathname.startsWith("/api")) {
+            
             if (req.nextUrl.pathname.includes("/api/orgchart/uploads")) {
                 const newPath = req.nextUrl.pathname.replace("/api/orgchart/uploads", "/api/orgchart/upload")
                 return NextResponse.redirect(new URL(newPath, req.url))
@@ -33,7 +35,7 @@ export default withAuth(
             authorized: (req) => {
                 const { token } = req
                 const pathName = req.req.nextUrl.pathname
-                const checkPathname = pathName.startsWith('/menu')
+                const checkPathname = pathName.startsWith('/menu') || pathName.startsWith('/hrLeave')
                 if (!token && checkPathname) {
                     return false
                 }

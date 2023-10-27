@@ -163,7 +163,9 @@ export default function AccountMenu({
           <button
             onClick={() => {
               setAnchorEl(null);
-              signOut();
+              signOut({
+                callbackUrl: `https://login.microsoftonline.com/${process.env.NEXT_PUBLIC_AZURE_AD_TENANT_ID}/oauth2/v2.0/logout?post_logout_redirect_uri=${process.env.NEXT_PUBLIC_NEXTAUTH_URL}login`,
+              });
             }}
             className="bg-[#1976D2] mx-auto my-2 text-white text-lg font-semibold h-12 w-28 rounded-md flex items-center gap-2 justify-center"
           >

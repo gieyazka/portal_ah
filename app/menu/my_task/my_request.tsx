@@ -45,7 +45,7 @@ export default function SubComponent(props: any) {
   const lastPath = splitPath[splitPath.length - 1];
   const [value, setValue] = React.useState("1");
   const user = _apiFn.useUser();
-
+console.log('user',user)
   const dialogStore = useDialogStore();
 
   const [realData, setRealData] = React.useState();
@@ -57,25 +57,26 @@ export default function SubComponent(props: any) {
       ? "Rejected"
       : "Success";
   let mytask = _apiFn.useMyTask({
-    empid: user?.data?.user?.username,
+    // empid: user?.data?.user?.username,
+    email: user?.data?.user?.email,
     status: status,
     startDate: filterStore.startDate,
     endDate: filterStore.endDate,
     isFetch: filterStore.isFetch,
   });
 
-  React.useEffect(() => {
-    if (dialogStore.open && dialogStore.task !== undefined) {
-      const selectedTask = mytask.data?.find(
-        (d: any) => d.task_id === dialogStore.task?.task_id
-      );
-      if (selectedTask === undefined) {
-        dialogStore.onCloseDialog();
-      } else {
-        dialogStore.onReload({ task: selectedTask });
-      }
-    }
-  }, [mytask.data]);
+  // React.useEffect(() => {
+  //   if (dialogStore.open && dialogStore.task !== undefined) {
+  //     const selectedTask = mytask.data?.find(
+  //       (d: any) => d.task_id === dialogStore.task?.task_id
+  //     );
+  //     if (selectedTask === undefined) {
+  //       dialogStore.onCloseDialog();
+  //     } else {
+  //       dialogStore.onReload({ task: selectedTask });
+  //     }
+  //   }
+  // }, [mytask.data]);
 
   // React.useMemo(() => {
   //   if (filterStore.isFetch) {
@@ -85,8 +86,18 @@ export default function SubComponent(props: any) {
   const headerTable: headerTable[] = [
     // { field: "Doc.id", value: "task_id" },
     { label: "Doc.Type", field: "Doc.Type", value: "data.flowName" },
-    { label: "Emp.ID", field: "Emp_id", value: "data.requester.empid" ,     width: 150, },
-    { label: "Requester", field: "Requester ", value: "data.requester.name"  ,    width: 300,},
+    {
+      label: "Emp.ID",
+      field: "Emp_id",
+      value: "data.requester.empid",
+      width: 150,
+    },
+    {
+      label: "Requester",
+      field: "Requester ",
+      value: "data.requester.name",
+      width: 300,
+    },
     {
       label: "Description",
       field: "Description",

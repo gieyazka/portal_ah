@@ -43,7 +43,8 @@ export default function Head() {
       <meta name="viewport" content="width=device-width, initial-scale=1" />
       <title>E-Workflow Portal</title>
       <meta content="width=device-width, initial-scale=1" name="viewport" />
-      <link rel="icon" href="/assets/aapico-logo.png" />
+      <link rel="apple-touch-icon" href="/assets/icon_portal.png"></link>
+      <link rel="icon" href="/assets/icon_portal.png" />
     </>
   );
 }

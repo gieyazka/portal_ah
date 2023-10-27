@@ -47,6 +47,9 @@ export default function Action_log(props: any) {
       setRealData(mytask.data);
     }
   }, [filterStore.isFetch, mytask.data]);
+
+
+
   const headerTable: headerTable[] = [
     // { field: "Doc.id", value: "task_id" },
     { label: "Doc.Type", field: "Doc.Type", value: "data.flowName" },

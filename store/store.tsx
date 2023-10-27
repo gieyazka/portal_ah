@@ -104,7 +104,7 @@ const useFilterStore = create<filterStore>((set) => ({
   // endDate: dayjs().add(7, "day").endOf("day"),
   isFetch: true,
   filterStr: "",
-  filterDoc: "",
+  filterDoc: undefined,
   arrDoc: [],
   handleOpenDrawer: (arrDoc) =>
     set((state: any) => ({
@@ -122,27 +122,27 @@ const useFilterStore = create<filterStore>((set) => ({
         return {
           startDate: newDate,
           endDate: null,
-          isFetch: false,
+          // isFetch: false,
         };
       }
 
       return {
         startDate: newDate,
-        isFetch: false,
+        // isFetch: false,
       };
     }),
   handleChangeEndDate: (newDate: Dayjs) =>
     set((state: any) => {
       return {
         endDate: newDate,
-        isFetch: false,
+        // isFetch: false,
       };
     }),
   handleChangeFilterStr: (str: string | undefined) =>
     set((state: filterStore) => ({
       filterStr: str,
     })),
-  handleChangeFilterDoc: (str: string | undefined) =>
+  handleChangeFilterDoc: (str: any) =>
     set((state: filterStore) => ({
       filterDoc: str,
     })),
@@ -153,39 +153,43 @@ const useFilterStore = create<filterStore>((set) => ({
       }
       return { isFetch: true };
     }),
-  handleChangePeriod: (period: number | undefined) =>
+  handleChangePeriod: (period: number) =>
     set((state: any) => {
-      if (period) {
+      if (period !== 0) {
         return {
           period: period,
           startDate: dayjs().subtract(period, "days"),
           endDate: null,
-          isFetch: true,
+          // isFetch: true,
         };
       } else {
         return {
-          period: period,
+          period: 0,
           startDate: null,
           endDate: null,
-          isFetch: true,
+          // isFetch: true,
         };
       }
     }),
-  //   increasePopulation: () => set((state: any) => ({ bears: state.bears + 1 })),
-  //   removeAllBears: () => set({ bears: 0 }),
 }));
 const useSnackbarStore = create<snackbarStore>(
   zukeeper((set: any) => ({
     open: false,
     message: "",
+    title: "",
     type: undefined,
     progress: 100,
     countdown: 5,
-    showSnackBar: (message: string, type?: string | undefined) =>
+    showSnackBar: (props: {
+      title: string;
+      message?: string;
+      type?: string;
+    }) =>
       set((state: any) => ({
         open: true,
-        message: message,
-        type: type,
+        title: props.title,
+        message: props.message,
+        type: props.type,
         progress: 100,
         countdown: 3,
       })),

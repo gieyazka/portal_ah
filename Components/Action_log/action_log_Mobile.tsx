@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 import {
   Block,
+  BrokenImage,
   Check,
   Clear,
   DisplaySettings,
@@ -26,6 +27,7 @@ import { approverList, previewStore } from "@/types/next-auth";
 import { usePreviewStore, useViewStore } from "@/store/store";
 
 import DownloadIcon from "@mui/icons-material/Download";
+import FilePreview_Mobile from "./filePreview_Mobile";
 import { FolderCross } from "iconsax-react";
 import FolderOffOutlinedIcon from "@mui/icons-material/FolderOffOutlined";
 import Image from "next/image";
@@ -38,11 +40,11 @@ import fn from "@/utils/common";
 const Action_log = ({
   actionLog,
   storePreview,
-  fileState,
-}: {
+}: // fileState,
+{
   actionLog: approverList[] | undefined;
   storePreview: previewStore;
-  fileState: any;
+  // fileState: any;
 }) => {
   // console.log(actionLog);
   const viewStore = useViewStore();
@@ -80,13 +82,12 @@ const Action_log = ({
           <AccordionDetails className="p-0 flex w-full">
             <div className="flex-1 flex flex-col gap-2 p-2 w-full ">
               {actionLog.map((approverData: approverList, index: number) => {
-                console.log("approverData", approverData);
                 const isApproved = approverData.action !== "Rejected";
                 const bgColor =
                   approverData.action === "Submit"
                     ? "bg-[#1D336D]"
                     : approverData.action === "Resubmit"
-                    ? "bg-[#FFE175]"
+                    ? "bg-[#FDBC3F]"
                     : approverData.action === "Rejected" ||
                       approverData.action === "HR Cancel"
                     ? "bg-[#EB4242]"
@@ -157,61 +158,12 @@ const Action_log = ({
                         </Tooltip>
                       </div>
                       <div className="flex-1 w-[calc(100%_-_1.25rem)] overflow-x-auto  flex flex-col ">
-                        {fileState === undefined && (
-                          <div className="  flex-1 items-center gap-4 ">
-                            <div className="m-auto  flex ">
-                              {/* <FolderOffOutlinedIcon className="" /> */}
-                              <FolderCross size="16" color="#818181" />
-                              <Typography component="p" className="    px-2">
-                                No File
-                              </Typography>
-                            </div>
-                          </div>
-                        )}
-                        {fileState?.length !== 0 && (
-                          <div className=" gap-2 flex   w-full text-center">
-                            {approverData?.filesURL?.map(
-                              (file: any, index: number) => {
-                                const fileType = file.name;
-                                let checkFile = fileType?.includes(".pdf")
-                                  ? "pdf"
-                                  : fn.isImageFile(fileType as string)
-                                  ? "image"
-                                  : "file";
-                                return (
-                                  <>
-                                    <div
-                                      onClick={() => {
-                                        fn.onPreviewFile(
-                                          file.name,
-                                          checkFile,
-                                          storePreview
-                                        );
-                                      }}
-                                      className="cursor-pointer    relative rounded-[10px] w-full  flex gap-2 items-center "
-                                    >
-                                      <div className=" text-[#1D336D]">
-                                        {checkFile === "pdf" ? (
-                                          <PictureAsPdf className="    " />
-                                        ) : checkFile === "image" ? (
-                                          <ImageOutlinedIcon className=" " />
-                                        ) : (
-                                          <DownloadIcon className="  " />
-                                        )}
-                                      </div>
-                                      <Typography
-                                        component="p"
-                                        className=" text-[#000] text-sm truncate  my-2"
-                                      >
-                                        {file.name}
-                                      </Typography>
-                                    </div>
-                                  </>
-                                );
-                              }
-                            )}
-                          </div>
-                        )}
+                        <FilePreview_Mobile
+                          key={`action_${index}`}
+                          approverData={approverData}
+                          index={index}
+                        />
+                    
                       </div>
                     </div>
                   </div>

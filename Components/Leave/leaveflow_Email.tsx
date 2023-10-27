@@ -32,7 +32,7 @@ const Leave_Flow = (props: {
     return (
       <div className="">
         <div className="flex w-full h-full gap-2 my-2">
-          <div className=" ">
+          <div className="w-1/2 ">
             <LeaveDetail
               getTileClassName={getTileClassName}
               task={task}

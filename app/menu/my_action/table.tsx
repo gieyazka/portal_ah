@@ -22,6 +22,7 @@ import {
   Skeleton,
   Stack,
   TextField,
+  Tooltip,
   Typography,
   useAutocomplete,
 } from "@mui/material";
@@ -44,6 +45,7 @@ import Autocomplete from "@mui/material/Autocomplete";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { SWRResponse } from "swr";
 import commonJs from "@/utils/common";
+import fn from "@/utils/common";
 import relativeTime from "dayjs/plugin/relativeTime";
 
 dayjs.extend(relativeTime);
@@ -53,7 +55,6 @@ const RenderExportTable = ({
   loading,
   data,
   subpath,
-  
 }: {
   headerTable: headerTable[];
   loading: boolean;
@@ -123,35 +124,11 @@ const RenderExportTable = ({
       };
     });
   };
-  const handleFilter = (data: task[]) => {
-    let filter = filterStore.filterStr;
-    let filterDoc = filterStore.filterDoc;
-    if (
-      (filter === undefined || filter === "") &&
-      (filterDoc === "" || filterDoc === undefined)
-    ) {
-      return data;
-    }
-    const filterData = data?.filter((d: task) => {
-      return (
-        d.data?.flowName === filterDoc ||
-        d.data?.requester?.name
-          ?.toUpperCase()
-          .includes((filter as string).toUpperCase()) ||
-        d.data?.requester?.empid
-          ?.toUpperCase()
-          .includes((filter as string).toUpperCase())
-      );
-    });
-    return filterData;
-  };
+
   const sliceData = (data: {}[]) => {
     const cloneData = [...data];
     return cloneData.slice(tableFooter.start - 1, tableFooter.end);
   };
-
-  // console.log("getInputProps", getInputProps());
-  const [value, setValue] = React.useState<any>();
   const arr = _.uniq(
     _.flatMap(data, (obj: { [key: string]: any }) => obj?.data?.flowName)
   );
@@ -159,9 +136,13 @@ const RenderExportTable = ({
     label: item === "leave_flow" ? "E-Leave" : item,
     value: item,
   }));
-  React.useEffect(() => {
-    filterStore.handleChangePeriod(undefined);
-  }, []);
+  // React.useEffect(() => {
+  //   if (subpath === "action_logs") {
+  //     filterStore.handleChangePeriod(30);
+  //   } else {
+  //     filterStore.handleChangePeriod(undefined);
+  //   }
+  // }, []);
   return (
     <div className="overflow-auto h-full">
       <div className="mb-4 flex items-end justify-between ">
@@ -185,10 +166,11 @@ const RenderExportTable = ({
               multiple={false}
               // value={filterStore.filterDoc ?? ""}
               onChange={(event: any, newValue: any) => {
+                console.log("newValue", newValue);
                 if (newValue !== null) {
-                  filterStore.handleChangeFilterDoc(newValue.value);
+                  filterStore.handleChangeFilterDoc(newValue);
                 } else {
-                  filterStore.handleChangeFilterDoc("undefined");
+                  filterStore.handleChangeFilterDoc(undefined);
                 }
                 // setValue(newValue.value);
               }}
@@ -246,7 +228,7 @@ const RenderExportTable = ({
               }}
               className="text-base text-[#1D366D] py-0   p-2.5   font-semibold w-full mt-[5px]  rounded-lg focus:ring-blue-500 focus:border-blue-500 block  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             >
-              <option value={undefined}>Select Period</option>
+              <option value={0}>Select Period</option>
               <option value={3}>Last 3 days</option>
               <option value={7}>Last 7 days</option>
               <option value={15}>Last 15 days</option>
@@ -328,9 +310,9 @@ const RenderExportTable = ({
               ? Array.from(new Array(10))
               : data !== undefined && data.length > 0
               ? currentOrder.value === undefined
-                ? sliceData(handleFilter(data))
+                ? sliceData(commonJs.handleFilter(data, filterStore))
                 : sliceData(
-                    handleFilter(
+                    commonJs.handleFilter(
                       _.orderBy(
                         data,
                         (item) =>
@@ -341,146 +323,169 @@ const RenderExportTable = ({
                           ),
                         //@ts-ignore
                         [`${currentOrder.type!}`]
-                      )
+                      ),
+                      filterStore
                     )
                   )
               : []
-            ).map((task: any, i: number) => (
-              <div
-                className={`rounded-xl flex flex-1  h-full relative  content-center  justify-between ${
-                  i % 2 !== 0 ? "bg-white" : "bg-[#F5F5F5]"
-                }`}
-                key={i.toString()}
-              >
-                {headerTable.map((key: any, index: number) => {
-                  if (key.actionClick !== undefined) {
-                    return (
-                      <div
-                        key={key.field}
-                        className={`text-center  flex-1  cursor-pointer flex flex-col justify-center  font-semibold text-[#1976D2] hover:text-white   ${
-                          key.field === "Action" &&
-                          "bg-[#D4E8FC] hover:bg-[#1976D2]"
-                        } rounded-r-lg  `}
-                        onClick={async () => {
-                          key.actionClick({ task });
-                        }}
-                      >
-                        <Typography
-                          component="p"
-                          className="text-lg font-medium "
-                        >
-                          {subpath === "action_logs" ? "View" : "Action"}
-                        </Typography>
-                        {/* {key.component({ task })} */}
-                      </div>
-                    );
-                  } else {
-                    let checkValue = key.value.split(".");
-                    let value =
-                      task && eval(`task${commonJs.varString(checkValue)}`);
-
-                    if (key.field === "status") {
-                      // value = value && dayjs(value).fromNow(true);
-                      //TODO: check color
-                      let message = value;
-                      let style = {
-                        backgroundColor: "#a7e5a6",
-                        color: "#0C0D17",
-                      };
-                      switch (value) {
-                        case "Waiting":
-                          style.backgroundColor = "#1976D2";
-                          style.color = "#fff";
-                          message = "In Process";
-                          break;
-                        case "Rejected":
-                          style.backgroundColor = "#EB4242";
-                          style.color = "#fff";
-                          message = value;
-                          break;
-                        case "Cancel":
-                          style.backgroundColor = "#ededed";
-                          style.color = "#0C0D17";
-                          message = value;
-                          break;
-                        case "hrCancel":
-                          style.backgroundColor = "#f39b19";
-                          style.color = "#fff";
-                          message = "HR Cancel";
-                          break;
-                        default:
-                          break;
-                      }
-
-                      return (
-                        <div
-                          key={key.field}
-                          className={` text-center flex-1 flex items-center  `}
-                        >
-                          <div className="w-fit mx-auto">
-                            <Typography
-                              style={{ ...style }}
-                              component="p"
-                              className={` my-2 px-4  w-[120px] h-[32px] rounded-[18px] text-lg font-medium`}
-                            >
-                              {message}
-                            </Typography>
-                          </div>
-                        </div>
-                      );
-                    }
-
-                    if (key.field === "IssueDate") {
-                      value = value && dayjs(value).format("DD/MM/YYYY");
-                    }
-
-                    if (key.field === "Description") {
-                      value =
-                        value && value.length > 100
-                          ? value.slice(0, 97) + "..."
-                          : value;
-                    }
-                    if (key.field === "Pending") {
-                      value = value && dayjs(value).fromNow(true);
-                    }
-                    if (key.field === "Doc.Type") {
-                      if (value === "leave_flow") {
-                        value = "E-Leave";
-                      }
-                    }
-
-                    return (
-                      <div
-                        key={i.toString() + index.toString()}
-                        className={`text-center   flex  flex-col  justify-center  ${
-                          !key.width && "flex-1"
-                        }`}
-                        style={{
-                          width: key.width || "auto",
-                        }}
-                      >
-                        {!loading ? (
-                          key.field === "Doc.id" ? (
-                            <Typography
-                              component="p"
-                              className="text-base whitespace-nowrap "
-                            >
-                              {value}
-                            </Typography>
-                          ) : (
-                            <Typography component="p" className="text-base ">
-                              {value}
-                            </Typography>
-                          )
-                        ) : (
-                          <Skeleton />
-                        )}
-                      </div>
-                    );
+            ).map((task: any, i: number) => {
+              const checkNeedFileLeave = task
+                ? fn.checkNeedFileLeave(task)
+                : false;
+              return (
+                <Tooltip
+                  key={i.toString()}
+                  title={
+                    checkNeedFileLeave
+                      ? `Need file for type ${task?.data?.type?.label}`
+                      : undefined
                   }
-                })}
-              </div>
-            ))}
+                >
+                  <div
+                    className={`rounded-xl flex flex-1  h-full relative  content-center  justify-between hover:bg-[#1D336D] ${
+                      checkNeedFileLeave
+                        ? "bg-[#FF9549] hover:bg-[#FFE5D2] text-black"
+                        : i % 2 !== 0
+                        ? "bg-white"
+                        : "bg-[#F5F5F5]"
+                    }    hover:text-white
+                    `}
+                  >
+                    {headerTable.map((key: any, index: number) => {
+                      if (key.actionClick !== undefined) {
+                        return (
+                          <div
+                            key={key.field}
+                            className={`text-center  flex-1  cursor-pointer flex flex-col justify-center  font-semibold text-[#1976D2] hover:text-white   ${
+                              key.field === "Action" &&
+                              "bg-[#D4E8FC] hover:bg-[#1976D2]"
+                            } rounded-r-lg  `}
+                            onClick={async () => {
+                              key.actionClick({ task });
+                            }}
+                          >
+                            <Typography
+                              component="p"
+                              className="text-lg font-medium "
+                            >
+                              {subpath === "action_logs" ? "View" : "Action"}
+                            </Typography>
+                            {/* {key.component({ task })} */}
+                          </div>
+                        );
+                      } else {
+                        let checkValue = key.value.split(".");
+
+                        let value =
+                          task && eval(`task${commonJs.varString(checkValue)}`);
+
+                        if (key.field === "status") {
+                          // value = value && dayjs(value).fromNow(true);
+                          //TODO: check color
+                          let message = value;
+                          let style = {
+                            backgroundColor: "#a7e5a6",
+                            color: "#0C0D17",
+                          };
+                          switch (value) {
+                            case "Waiting":
+                              style.backgroundColor = "#1976D2";
+                              style.color = "#fff";
+                              message = "In Process";
+                              break;
+                            case "Rejected":
+                              style.backgroundColor = "#EB4242";
+                              style.color = "#fff";
+                              message = value;
+                              break;
+                            case "Cancel":
+                              style.backgroundColor = "#ededed";
+                              style.color = "#0C0D17";
+                              message = value;
+                              break;
+                            case "hrCancel":
+                              style.backgroundColor = "#f39b19";
+                              style.color = "#fff";
+                              message = "HR Cancel";
+                              break;
+                            default:
+                              break;
+                          }
+
+                          return (
+                            <div
+                              key={key.field}
+                              className={` text-center flex-1 flex items-center  `}
+                            >
+                              <div className="w-fit mx-auto">
+                                <Typography
+                                  style={{ ...style }}
+                                  component="p"
+                                  className={` my-2 px-4  w-[120px] h-[32px] rounded-[18px] text-lg font-medium`}
+                                >
+                                  {message}
+                                </Typography>
+                              </div>
+                            </div>
+                          );
+                        }
+
+                        if (key.field === "IssueDate") {
+                          value = value && dayjs(value).format("DD/MM/YYYY");
+                        }
+
+                        if (key.field === "Description") {
+                          value =
+                            value && value.length > 100
+                              ? value.slice(0, 97) + "..."
+                              : value;
+                        }
+                        if (key.field === "Pending") {
+                          value = value && dayjs(value).fromNow(true);
+                        }
+                        if (key.field === "Doc.Type") {
+                          if (value === "leave_flow") {
+                            value = "E-Leave";
+                          }
+                        }
+
+                        return (
+                          <div
+                            key={i.toString() + index.toString()}
+                            className={`text-center   flex  flex-col  justify-center  ${
+                              !key.width && "flex-1"
+                            }`}
+                            style={{
+                              width: key.width || "auto",
+                            }}
+                          >
+                            {!loading ? (
+                              key.field === "Doc.id" ? (
+                                <Typography
+                                  component="p"
+                                  className="text-base whitespace-nowrap "
+                                >
+                                  {value}
+                                </Typography>
+                              ) : (
+                                <Typography
+                                  component="p"
+                                  className="text-base "
+                                >
+                                  {value}
+                                </Typography>
+                              )
+                            ) : (
+                              <Skeleton />
+                            )}
+                          </div>
+                        );
+                      }
+                    })}
+                  </div>
+                </Tooltip>
+              );
+            })}
           </div>
         </div>
       </div>

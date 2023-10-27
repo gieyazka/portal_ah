@@ -25,9 +25,9 @@ export default function TemporaryDrawer() {
     right: false,
   });
   const filterStore = useFilterStore();
-  React.useEffect(() => {
-    filterStore.handleChangePeriod(undefined);
-  }, []);
+  // React.useEffect(() => {
+  //   filterStore.handleChangePeriod(undefined);
+  // }, []);
   return (
     <div>
       <React.Fragment key={"bottom"}>
@@ -62,14 +62,13 @@ export default function TemporaryDrawer() {
                       id="period"
                       onChange={(e) => {
                         if (e.target.value !== null) {
-                          console.log("e", e.target.value);
                           filterStore.handleChangePeriod(
                             parseInt(e.target.value)
                           );
                           // filterStore.handleChangeEndDate(e);
                         }
                       }}
-                      value={filterStore.period ?? undefined}
+                      value={filterStore.period}
                       style={{
                         height: "46px",
                         borderRadius: "10px",
@@ -79,7 +78,7 @@ export default function TemporaryDrawer() {
                       }}
                       className="text-base text-[#1D366D] py-0   p-2.5   font-semibold w-full mt-[5px]  rounded-lg focus:ring-blue-500 focus:border-blue-500 block  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     >
-                      <option value={undefined}>Select Period</option>
+                      <option value={0}>Select Period</option>
                       <option value={3}>Last 3 days</option>
                       <option value={7}>Last 7 days</option>
                       <option value={15}>Last 15 days</option>
@@ -113,11 +112,18 @@ export default function TemporaryDrawer() {
                       multiple={false}
                       onChange={(event: any, newValue: any) => {
                         if (newValue !== null) {
-                          filterStore.handleChangeFilterDoc(newValue.value);
+                          filterStore.handleChangeFilterDoc(newValue);
                         } else {
                           filterStore.handleChangeFilterDoc(undefined);
                         }
                       }}
+                      isOptionEqualToValue={(option: any, value: any) => {
+                        return option.value === filterStore.filterDoc;
+                      }}
+                      value={filterStore.filterDoc}
+                      // renderTags={() => {
+                      //   return <div>123</div>;
+                      // }}
                       id="selectDocID"
                       options={filterStore.arrDoc}
                       renderInput={(params) => {

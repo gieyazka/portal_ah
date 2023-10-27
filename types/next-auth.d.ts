@@ -35,6 +35,7 @@ declare module "next-auth" {
 type userData = {
   id?: string
   jwt?: string
+  email: string
   rule?: string
   empid?: string
   department?: string
@@ -113,19 +114,21 @@ type filterStore = {
   period: number | undefined;
   docType: string | null,
   filterStr: string | undefined;
-  filterDoc: string | undefined;
+  filterDoc: { value: any, label: string } | undefined;
   arrDoc: { label: string, value: stirg }[],
   handleOpenDrawer: (transformedArray: any) => void;
   handleCloseDrawer: () => void;
   handleChangeStartDate: (newDate: Dayjs) => void;
   handleChangeEndDate: (newDate: Dayjs) => void;
   handleChangeFilterStr: (str: string | undefined) => void;
-  handleChangeFilterDoc: (str: string | undefined) => void;
+  handleChangeFilterDoc: (any) => void;
   searchClick: () => void;
-  handleChangePeriod: (period: number | undefined) => void;
+  handleChangePeriod: (period: number) => void;
 }
 
 type requester = {
+  startDate: ReactNode;
+  sub_section: string;
   company?: string, name?: string, department?: string, section?: string, empid?: string, position?: string
 }
 
@@ -166,12 +169,13 @@ type actionDialogStore = {
   onReload: (prop: { task: any }) => void;
 }
 type snackbarStore = {
+  title: stirng;
   open: boolean;
-  message: string
+  message?: string
   type?: AlertColor | undefined,
   countdown: number,
   progress: number,
-  showSnackBar: (message: string, type?: string | undefined) => void;
+  showSnackBar: (props: { title: string, message?: string, type?: string | undefined }) => void;
   closeSnackbar: () => void;
   onCountdown: () => void
 }

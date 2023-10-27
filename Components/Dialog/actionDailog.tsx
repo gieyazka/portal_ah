@@ -86,19 +86,35 @@ const RenderSubDialog = (props: {
   };
   const storePreview = usePreviewStore();
   const viewStore = useViewStore();
-
+  const dialogStore = useDialogStore();
+  React.useMemo(() => {
+    if (dialogStore.open && dialogStore.task !== undefined) {
+      const selectedTask = actionDialogStore.swrResponse?.data.find(
+        (d: any) => d.task_id === dialogStore.task?.task_id
+      );
+      console.log(
+        "actionDialogStore.swrResponse?.data",
+        actionDialogStore.swrResponse?.data
+      );
+      console.log("selectedTask", selectedTask);
+      if (selectedTask === undefined) {
+        dialogStore.onCloseDialog();
+      } else {
+        dialogStore.onReload({ task: selectedTask });
+      }
+    }
+  }, [actionDialogStore.swrResponse?.data]);
   //TODO : refetch
   const onSubmit = async (values: any) => {
-    let newType = values.type;
     // let newType = type;
     // if (values.type !== undefined) {
     // newType = values.type;
     // }
-    console.log("newType", newType);
+    // console.log("newType", newType);
     const isApprove = actionDialogStore.action;
     loadingStore.setLoading(true);
     delete values.type;
-    console.log("101", isApprove);
+    // console.log("101", isApprove);
     const res = await _apiFn.actionJob(
       task,
       "approved",
@@ -106,17 +122,23 @@ const RenderSubDialog = (props: {
       user.data ?? undefined,
       values
     );
+    let newType = isApprove ? "Approve" : "Reject";
     loadingStore.setLoading(false);
     if (res.status === 200) {
       actionDialogStore.swrResponse?.mutate();
-      snackbarStore.showSnackBar(
-        `${newType?.toUpperCase()} Success`,
-        "success"
-      );
+      snackbarStore.showSnackBar({
+        title: `${newType?.toUpperCase()} Success`,
+
+        type: "success",
+      });
       handleCloseSubialog();
       // filterStore.searchClick();
     } else {
-      snackbarStore.showSnackBar(`${newType?.toUpperCase()} Failed`, "error");
+      snackbarStore.showSnackBar({
+        title: `${newType?.toUpperCase()} Failed`,
+        message: res.data.errors,
+        type: "error",
+      });
     }
   };
   const fileForm = watch("file") || [];
@@ -171,7 +193,8 @@ const RenderSubDialog = (props: {
               component="p"
               className="text-xl rounded-t-[10px] text-[#1976D2]  font-bold px-2"
             >
-              Remark
+              Confirm : {actionDialogStore.action ? "Approve" : "Reject"}
+              {/* Remark */}
             </Typography>
             <Clear
               className="ml-6 cursor-pointer"
@@ -185,8 +208,9 @@ const RenderSubDialog = (props: {
               <div className="flex gap-2">
                 <div>
                   <textarea
+                    placeholder="Remark"
                     rows={3}
-                    defaultValue=""
+                    // defaultValue=""
                     {...register("remark")}
                     className=" py-2 pr-24 pl-2  bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pt-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   />
@@ -304,7 +328,7 @@ const RenderSubDialog = (props: {
             </form>
           </div>
         </DialogContent>
-        <DialogActions>
+        <DialogActions sx={{ justifyContent: "center" }}>
           {type !== undefined ? (
             <>
               {user.isLoading ? (

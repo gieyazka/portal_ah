@@ -30,13 +30,8 @@ import {
 } from "@/store/store";
 import { usePreviewStore, useViewStore } from "@/store/store";
 
-import FileAttach from "@/Components/fileAttached";
-import Image from "next/image";
-import LeaveDetail from "@/Components/Leave/leaveflow";
+import Leave from "@/Components/Leave/";
 import Leave_FlowEmail from "@/Components/Leave/leaveflow_Email";
-import LoadingButton from "@mui/lab/LoadingButton";
-import Requester from "@/Components/requester/requester";
-import Swal from "sweetalert2";
 import _apiFn from "@/utils/apiFn";
 import _fn from "@/utils/common";
 import dayjs from "dayjs";
@@ -190,12 +185,9 @@ export default function EmailPage({ params }: { params: any }) {
             </div>
           ))}
       </Backdrop> */}
-      <div className="p-4    overflow-auto">
+      <div className="p-4  h-[90vh]  overflow-auto">
         {task.data.data.flowName === "leave_flow" ? (
-          <Leave_FlowEmail
-            getTileClassName={getTileClassName}
-            task={task.data}
-          />
+          <Leave task={task.data} />
         ) : (
           // <div className="h-full w-full">
           //   {viewStore.isMd ? (

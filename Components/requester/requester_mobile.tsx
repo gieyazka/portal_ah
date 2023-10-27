@@ -11,6 +11,7 @@ import ApproverStep from "../approver_step";
 import { ExpandMore } from "@mui/icons-material";
 import { User } from "iconsax-react";
 import dayjs from "dayjs";
+import fn from "@/utils/common";
 
 const Requester = (props: { requester: requester }) => {
   const requester = props.requester;
@@ -79,7 +80,7 @@ const Requester = (props: { requester: requester }) => {
                 </b>{" "}
                 {requester.empid}
               </Typography>
-              
+
               <Typography component="p">
                 <b
                   style={{
@@ -106,10 +107,11 @@ const Requester = (props: { requester: requester }) => {
                     lineHeight: "170%",
                   }}
                 >
-                  Employee ID :
+                  Department :
                 </b>{" "}
                 {requester.department}
               </Typography>
+
               <Typography component="p">
                 <b
                   style={{
@@ -125,10 +127,39 @@ const Requester = (props: { requester: requester }) => {
                 </b>{" "}
                 {requester.section}
               </Typography>
+              <Typography component="p">
+                <b
+                  style={{
+                    color: "#1D366D",
+                    fontFamily: " Bai Jamjuree",
+                    fontSize: "16px",
+                    fontStyle: "normal",
+                    fontWeight: 600,
+                    lineHeight: "170%",
+                  }}
+                >
+                  Sub Section :
+                </b>{" "}
+                {requester.sub_section}
+              </Typography>
+              <Typography component="p">
+                <b
+                  style={{
+                    color: "#1D366D",
+                    fontFamily: " Bai Jamjuree",
+                    fontSize: "16px",
+                    fontStyle: "normal",
+                    fontWeight: 600,
+                    lineHeight: "170%",
+                  }}
+                >
+                  Start Date :
+                </b>{" "}
+                {requester.startDate} ({fn.getDiffDate(requester.startDate)})
+              </Typography>
             </div>
           </AccordionDetails>
         </Accordion>
-        
       </div>
     </div>
   );

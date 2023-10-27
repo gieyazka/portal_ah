@@ -16,15 +16,22 @@ export default async function handler(
     if (req.method === 'POST') {
         const { path } = req.query
         const data = req.body
-        const resTask = await axios.post(`${process.env.NEXT_PUBLIC_Strapi}/api/${path}`,
+        const joinPath = path?.join('/');
+        const resTask = await axios.post(`${process.env.NEXT_PUBLIC_Strapi}/api/${joinPath}`,
             data
         )
         res.status(resTask.status).json(resTask.data)
     } else {
 
         const { path, ...query } = req.query
+        const joinPath = path?.join('/');
         const newQuery = fn.objectToQueryString(query)
-        const resTask = await axios.get(`${process.env.NEXT_PUBLIC_Strapi}/api/${path}?${newQuery}`)
+        if (newQuery) {
+            const resTask = await axios.get(`${process.env.NEXT_PUBLIC_Strapi}/api/${joinPath}?${newQuery}`)
+            res.status(resTask.status).json(resTask.data)
+            return resTask
+        }
+        const resTask = await axios.get(`${process.env.NEXT_PUBLIC_Strapi}/api/${joinPath}`)
         res.status(resTask.status).json(resTask.data)
 
     }

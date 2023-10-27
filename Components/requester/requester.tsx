@@ -3,6 +3,7 @@ import { requester, task } from "@/types/next-auth";
 
 import { User } from "iconsax-react";
 import dayjs from "dayjs";
+import fn from "@/utils/common";
 
 const Requester = (props: { requester: requester }) => {
   const requester = props.requester;
@@ -26,7 +27,7 @@ const Requester = (props: { requester: requester }) => {
               <User size="32" color="#464C59" />
             </Avatar>
           </div>
-          <div className='flex gap-2'>
+          <div className="flex gap-2">
             <div className="basis-[35%] whitespace-nowrap">
               <Typography component="p">
                 <b
@@ -58,6 +59,21 @@ const Requester = (props: { requester: requester }) => {
                 </b>{" "}
                 {requester.empid}
               </Typography>
+              <Typography component="p">
+                <b
+                  style={{
+                    color: "#1D366D",
+                    fontFamily: " Bai Jamjuree",
+                    fontSize: "16px",
+                    fontStyle: "normal",
+                    fontWeight: 600,
+                    lineHeight: "170%",
+                  }}
+                >
+                  Start Date :
+                </b>{" "}
+                {requester.startDate} ({fn.getDiffDate(requester.startDate)})
+              </Typography>
             </div>
             <div className="basis-[35%] whitespace-nowrap">
               <Typography component="p">
@@ -86,7 +102,7 @@ const Requester = (props: { requester: requester }) => {
                     lineHeight: "170%",
                   }}
                 >
-                  Employee ID :
+                  Department :
                 </b>{" "}
                 {requester.department}
               </Typography>
@@ -104,6 +120,21 @@ const Requester = (props: { requester: requester }) => {
                   Section :
                 </b>{" "}
                 {requester.section ?? "-"}
+              </Typography>
+              <Typography component="p">
+                <b
+                  style={{
+                    color: "#1D366D",
+                    fontFamily: " Bai Jamjuree",
+                    fontSize: "16px",
+                    fontStyle: "normal",
+                    fontWeight: 600,
+                    lineHeight: "170%",
+                  }}
+                >
+                  Sub Section :
+                </b>{" "}
+                {requester.sub_section ?? "-"}
               </Typography>
             </div>
           </div>

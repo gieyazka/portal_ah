@@ -20,6 +20,7 @@ import { SWRResponse } from "swr";
 import _ from "lodash";
 import axios from "axios";
 import dayjs from "dayjs";
+import fn from "@/utils/common";
 import { useLoading } from "@/store/store";
 
 // import {use}
@@ -55,7 +56,6 @@ const LeaveDetail = (props: {
     const day = date.getDay();
     return day === 0; // Return true if it's a Sunday (0)
   };
-
 
   return (
     <div className="  w-full h-full relative">
@@ -133,28 +133,35 @@ const LeaveDetail = (props: {
               </div>
               <div className="flex flex-col mx-10 justify-center">
                 <Typography
+                  className="text-[#1D366D] font-semibold  text-lg "
+                  component="p"
+                >
+                  Type :{" "}
+                  <Typography
+                    className="text-[#464C59]  font-medium  text-lg "
+                    component="span"
+                  >
+                    {task.data.type.label}
+                  </Typography>
+                </Typography>
+
+                <Typography
                   className="text-[#1D366D] font-semibold  "
                   component="p"
                 >
-                  Amount :{" "}
+                  Total :{" "}
                   <Typography
-                    className="text-[#464C59]  font-medium "
+                    className="text-[#464C59] underline  font-medium "
                     component="span"
                   >
                     {task.data.amount} Day
                   </Typography>
                 </Typography>
                 <Typography
-                  className="text-[#1D366D] font-semibold  "
+                  className="text-[#EB4242] whitespace-nowrap font-semibold text-lg "
                   component="p"
                 >
-                  Type :{" "}
-                  <Typography
-                    className="text-[#464C59]  font-medium "
-                    component="span"
-                  >
-                    {task.data.type.label}
-                  </Typography>
+                  Leave Date : {fn.renderLeaveData(task.data.leaveData)}
                 </Typography>
                 <Typography
                   className="text-[#1D366D] font-semibold  "

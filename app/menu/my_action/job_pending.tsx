@@ -18,6 +18,7 @@ import Card_Mobile from "./card_mobile";
 import React from "react";
 import RenderTable from "./table";
 import ViewSickFlow from "@/Components/action_component/viewsickflow";
+import _ from "lodash";
 import _apiFn from "@/utils/apiFn";
 import menuData from "../menuItem";
 
@@ -48,21 +49,38 @@ export default function Job_Pending(props: any) {
     user: user?.data?.user,
     filterStore: filterStore,
   });
+
+  // let carbookingTask = _apiFn.useCarbookingTask({
+  //   user: user?.data?.user,
+  // });
+  // console.log("realData", realData);
   React.useMemo(() => {
-    if (filterStore.isFetch) {
-      setRealData(mytask.data);
-    }
-    if (dialogStore.open && dialogStore.task !== undefined) {
-      const selectedTask = mytask.data.find(
-        (d: any) => d.task_id === dialogStore.task?.task_id
-      );
-      if (selectedTask === undefined) {
-        dialogStore.onCloseDialog();
-      } else {
-        dialogStore.onReload({ task: selectedTask });
+    // if (filterStore.isFetch) {
+
+    //   setRealData();
+    // }
+    setRealData((prev: any) => {
+      let newArr = [];
+      if (mytask.data) {
+        newArr = _.cloneDeep(mytask.data);
       }
-    }
-  }, [filterStore.isFetch, mytask.data]);
+      // if (carbookingTask.data) {
+      //   newArr = [...newArr, ...carbookingTask.data];
+      // }
+      return newArr;
+    });
+    // if (dialogStore.open && dialogStore.task !== undefined) {
+    //   const selectedTask = mytask.data.find(
+    //     (d: any) => d.task_id === dialogStore.task?.task_id
+    //   );
+    //   if (selectedTask === undefined) {
+    //     dialogStore.onCloseDialog();
+    //   } else {
+    //     dialogStore.onReload({ task: selectedTask });
+    //   }
+    // }
+    }, [filterStore.isFetch, mytask.data]);
+  // }, [filterStore.isFetch, mytask.data, carbookingTask.data]);
 
   const headerTable: headerTable[] = [
     { label: "Doc.Type", field: "Doc.Type", value: "data.flowName" },
@@ -120,7 +138,6 @@ export default function Job_Pending(props: any) {
         headerTable={headerTable}
         loading={loading}
         data={realData}
-        
       />
     </div>
   );

@@ -1,5 +1,6 @@
 import { ArrowRight, FolderCross, User } from "iconsax-react";
 import { Avatar, Tooltip, Typography } from "@mui/material";
+import { BrokenImage, PictureAsPdf } from "@mui/icons-material";
 import { previewStore, requester, task } from "@/types/next-auth";
 
 import ApproverStep from "../approver_step";
@@ -7,7 +8,6 @@ import DownloadIcon from "@mui/icons-material/Download";
 import FolderOffOutlinedIcon from "@mui/icons-material/FolderOffOutlined";
 import Image from "next/image";
 import ImageOutlinedIcon from "@mui/icons-material/ImageOutlined";
-import { PictureAsPdf } from "@mui/icons-material";
 import React from "react";
 import _ from "lodash";
 import _apiFn from "@/utils/apiFn";
@@ -71,6 +71,9 @@ const FileAttached = ({
                   >
                     <div
                       onClick={async () => {
+                        if (file.isError) {
+                          return;
+                        }
                         await fn.onPreviewFile(
                           file.url,
                           checkFile,
@@ -80,7 +83,9 @@ const FileAttached = ({
                       className="cursor-pointer bg-[#F5F5F5] relative rounded-[10px] w-[31%] flex   gap-2 items-center justify-between"
                     >
                       <div className="ml-2 text-[#1D336D]">
-                        {checkFile === "pdf" ? (
+                        {file.isError ? (
+                          <BrokenImage />
+                        ) : checkFile === "pdf" ? (
                           <PictureAsPdf className="    " />
                         ) : checkFile === "image" ? (
                           <ImageOutlinedIcon className=" " />

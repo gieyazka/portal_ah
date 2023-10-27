@@ -19,6 +19,7 @@ import React, { useEffect, useState } from "react";
 import { ThemeProvider, createTheme, styled } from "@mui/material/styles";
 import { menuItem, subMenu } from "@/types/next-auth";
 import { signIn, signOut, useSession } from "next-auth/react";
+import { useFilterStore, useViewStore } from "@/store/store";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
@@ -37,7 +38,6 @@ import { authOptions } from "pages/api/auth/[...nextauth]";
 import axios from "axios";
 import fn from "@/utils/common";
 import useSWR from "swr";
-import { useViewStore } from "@/store/store";
 
 export default function RootLayout({
   children,
@@ -50,6 +50,17 @@ export default function RootLayout({
   const splitPath = pathName ? pathName.split("/") : [];
   const lastPath = splitPath[splitPath.length - 1];
   const [showSidebar, setShowSidebar] = useState(false);
+  const searchParams = useSearchParams();
+  const filterStore = useFilterStore();
+
+  React.useEffect(() => {
+    if (searchParams.get("current") === "job_pending") {
+      filterStore.handleChangePeriod(0);
+    } else {
+      filterStore.handleChangePeriod(30);
+    }
+  }, [searchParams.get("current")]);
+  // console.log("filterStore", filterStore);
   const sidebarOpen = {
     width: "208px",
   };
@@ -71,7 +82,6 @@ export default function RootLayout({
     width: viewStore.isMd ? "64px" : "0px",
   };
   const router = useRouter();
-  const searchParams = useSearchParams();
 
   if (viewStore.isMd === undefined || user.isLoading) {
     return <div>Loading...</div>;
@@ -178,13 +188,22 @@ export default function RootLayout({
             })}
           </div>
         </div>
+
         <div
           style={{
             borderRadius: "10px 0px 0px 10px",
             boxShadow: " -10px 4px 20px 0px rgba(0, 0, 0, 0.15)",
           }}
           className="cursor-pointer flex items-center justify-center text-lg bg-[#FFFFFF]  z-50 ml-[20px]  mt-[24px] w-[184px] h-[64px]  text-[#1D336D] hover:bg-[#1D336D]  hover:text-white"
-          onClick={() => signOut()}
+          onClick={() => {
+            // console.log(
+            //   "",
+            //   `https://login.microsoftonline.com/${process.env.NEXT_PUBLIC_AZURE_AD_TENANT_ID}/oauth2/v2.0/logout?post_logout_redirect_uri=${process.env.NEXT_PUBLIC_NEXTAUTH_URL}login`
+            // );
+            signOut({
+              callbackUrl: `https://login.microsoftonline.com/${process.env.NEXT_PUBLIC_AZURE_AD_TENANT_ID}/oauth2/v2.0/logout?post_logout_redirect_uri=${process.env.NEXT_PUBLIC_NEXTAUTH_URL}login`,
+            });
+          }}
         >
           <LogoutCurve size="24" />
           <p className="ml-[22px] font-bold">Log Out</p>

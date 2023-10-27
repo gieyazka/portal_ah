@@ -10,6 +10,8 @@
     "production": "next build && next start -p 8080 "
   },
   "dependencies": {
+    "@azure/msal-browser": "^3.2.0",
+    "@azure/msal-node": "^2.2.0",
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
     "@fontsource/bai-jamjuree": "^5.0.5",

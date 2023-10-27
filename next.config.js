@@ -6,6 +6,9 @@ const withPWA = require('next-pwa')({
 
 })
 const nextConfig = {
+  // api: {
+  //   responseLimit: false,
+  // },
   images: {
     remotePatterns: [
       {
@@ -61,5 +64,5 @@ const nextConfig = {
 
 }
 
-module.exports = (nextConfig)
-// module.exports = withPWA(nextConfig)
+// module.exports = (nextConfig)
+module.exports = withPWA(nextConfig)

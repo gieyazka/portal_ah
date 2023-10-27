@@ -41,9 +41,10 @@ const Leave_Flow = (props: { task: task }) => {
 
     if (result !== undefined) {
       if (result.active === true || result.active === undefined) {
-        if (result.value === 1) {
+        console.log('result',result)
+        if (result.value == 1) {
           return "rounded-full py-3  relative bg-[#1976D2] text-white";
-        } else if (result.value === 0.5) {
+        } else if (result.value == 0.5) {
           return "text-white rounded-full  py-3 border border-[#1976D2] bg-[#1976D2] bg-opacity-50";
         }
       }
@@ -68,7 +69,7 @@ const Leave_Flow = (props: { task: task }) => {
       <div className="">
         <ApproverStep task={task} />
         <div className="flex w-full h-full gap-2 my-2">
-          <div>
+          <div className="w-full">
             <LeaveDetail
               getTileClassName={getTileClassName}
               task={task}
@@ -76,7 +77,7 @@ const Leave_Flow = (props: { task: task }) => {
               leaveDaySwr={leaveDay}
             />
           </div>
-          <div className="w-auto flex flex-col items-stretch gap-2 relative ">
+          <div className="w-1/2 flex flex-col items-stretch gap-2 relative ">
             <div className="flex-grow relative ">
               <Requester requester={task?.data.requester} />
             </div>

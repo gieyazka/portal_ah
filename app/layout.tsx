@@ -27,6 +27,7 @@ export default function RootLayout({
   // const session = await unstable_getServerSession(authOptions);
   // console.log(Providers);
   const viewStore = useViewStore();
+  console.log('process.env.NODE_ENV',process.env.NODE_ENV)
   return (
     <html style={{ height: "100vh" }}>
 

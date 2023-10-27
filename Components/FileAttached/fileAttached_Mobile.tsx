@@ -7,7 +7,7 @@ import {
   Typography,
 } from "@mui/material";
 import { ArrowRight, FolderCross, User } from "iconsax-react";
-import { ExpandMore, PictureAsPdf } from "@mui/icons-material";
+import { BrokenImage, ExpandMore, PictureAsPdf } from "@mui/icons-material";
 import { previewStore, requester, task } from "@/types/next-auth";
 
 import DownloadIcon from "@mui/icons-material/Download";
@@ -92,13 +92,15 @@ const FileAttached = ({
                         className="cursor-pointer bg-[#F5F5F5] relative rounded-[10px] w-[100%] flex   gap-2 items-center justify-between"
                       >
                         <div className="px-2 flex gap-2 text-[#1D336D] w-full items-center">
-                          {checkFile === "pdf" ? (
-                            <PictureAsPdf className="    " />
-                          ) : checkFile === "image" ? (
-                            <ImageOutlinedIcon className=" " />
-                          ) : (
-                            <DownloadIcon className="  " />
-                          )}
+                        {file.isError ? (
+                          <BrokenImage />
+                        ) : checkFile === "pdf" ? (
+                          <PictureAsPdf className="    " />
+                        ) : checkFile === "image" ? (
+                          <ImageOutlinedIcon className=" " />
+                        ) : (
+                          <DownloadIcon className="  " />
+                        )}
 
                           <Typography
                             component="p"

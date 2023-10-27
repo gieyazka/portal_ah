@@ -7,7 +7,7 @@ import { menuItem, subMenu } from "@/types/next-auth";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import React from "react";
-import SubComponent from "./subComponent";
+import SubComponent from "./my_request";
 import menuData from "../menuItem";
 import { useViewStore } from "@/store/store";
 
@@ -39,12 +39,12 @@ export default function MyTask(props: { searchParams: { current: string } }) {
   //     ? currentMenu?.subMenu[0].url
   //     :searchParams.get("current");
   React.useEffect(() => {
-    console.log(searchParams.get("current"));
 
     if (searchParams.get("current") !== undefined) {
       setCurrentSubPath(searchParams.get("current"));
     }
   }, [searchParams.get("current")]);
+  console.log('46',47)
   return (
     // <div className=" p-1 bg-white rounded-xl">
     <div className="h-full w-full">

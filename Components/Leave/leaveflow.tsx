@@ -15,6 +15,7 @@ import { Typography } from "@mui/material";
 import _ from "lodash";
 import axios from "axios";
 import dayjs from "dayjs";
+import fn from "@/utils/common";
 import { useLoading } from "@/store/store";
 
 // import {use}
@@ -49,31 +50,6 @@ const LeaveDetail = (props: {
   const isWeekend = (date: Date) => {
     const day = date.getDay();
     return day === 0; // Return true if it's a Sunday (0)
-  };
-
-  const renderLeaveData = (leaveData: any) => {
-    const _leaveData = _.orderBy(leaveData, ["date"], ["asc"]);
-
-    const lastIndex = _leaveData.length - 1;
-
-    if (_leaveData.length > 1) {
-      if (
-        dayjs(_leaveData[0].date).isSame(
-          dayjs(_leaveData[lastIndex].date),
-          "month"
-        )
-      ) {
-        return `${dayjs(_leaveData[0].date).format("DD")}-${dayjs(
-          _leaveData[lastIndex].date
-        ).format("DD")}/${dayjs(_leaveData[0].date).format("MM/YYYY")}`;
-      } else {
-        return `${dayjs(_leaveData[0].date).format("DD/MM/YYYY")}-${dayjs(
-          _leaveData[lastIndex].date
-        ).format("DD/MM/YYYY")}`;
-      }
-    } else {
-      return `${dayjs(_leaveData[0].date).format("DD/MM/YYYY")}`;
-    }
   };
 
   return (
@@ -141,38 +117,37 @@ const LeaveDetail = (props: {
             </div>
             <div className="flex flex-col basis-2/5 justify-center">
               <Typography
-                className="text-[#EB4242] font-semibold text-lg "
-                component="p"
-              >
-                Leave Date : {renderLeaveData(task.data.leaveData)}
-              </Typography>
-
-              <Typography
-                className="text-[#1D366D] font-semibold text-lg "
-                component="p"
-              >
-                Amount :{" "}
-                <Typography
-                  className="text-[#464C59] text-lg font-medium "
-                  component="span"
-                >
-                  {task.data.amount} Day
-                </Typography>
-              </Typography>
-              <Typography
-                className="text-[#1D366D] font-semibold text-lg "
+                className="text-[#1D366D] whitespace-nowrap font-bold text-xl "
                 component="p"
               >
                 Type :{" "}
                 <Typography
-                  className="text-[#464C59] text-lg font-medium "
+                  className="text-[#464C59]  whitespace-nowrap text-xl font-medium "
                   component="span"
                 >
                   {task.data.type.label}
                 </Typography>
               </Typography>
               <Typography
-                className="text-[#1D366D] font-semibold text-lg "
+                className="text-[#1D366D] whitespace-nowrap font-semibold text-lg "
+                component="p"
+              >
+                Total :{" "}
+                <Typography
+                  className="text-[#464C59] underline whitespace-nowrap text-lg font-medium "
+                  component="span"
+                >
+                  {task.data.amount} Day
+                </Typography>
+              </Typography>
+              <Typography
+                className="text-[#EB4242] whitespace-nowrap font-semibold text-lg "
+                component="p"
+              >
+                Leave Date : {fn.renderLeaveData(task.data.leaveData)}
+              </Typography>
+              <Typography
+                className="text-[#1D366D] whitespace-nowrap font-semibold text-lg "
                 component="p"
               >
                 Issue Date :{" "}
@@ -183,8 +158,9 @@ const LeaveDetail = (props: {
                   {dayjs(task.issueDate).format("DD/MM/YYYY")}
                 </Typography>
               </Typography>
+
               <Typography
-                className="text-[#1D366D] font-semibold text-lg "
+                className="text-[#1D366D] whitespace-nowrap font-semibold text-lg "
                 component="p"
               >
                 Issue Time :{" "}

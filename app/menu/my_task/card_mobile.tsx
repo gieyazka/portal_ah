@@ -38,6 +38,7 @@ import ShareIcon from "@mui/icons-material/Share";
 import Typography from "@mui/material/Typography";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import _ from "lodash";
+import commonJs from "@/utils/common";
 import dayjs from "dayjs";
 import fn from "@/utils/common";
 import { red } from "@mui/material/colors";
@@ -91,20 +92,10 @@ export default function Card_Mobile({
     label: item === "leave_flow" ? "E-Leave" : item,
     value: item,
   }));
-  console.log("transformedArray", transformedArray);
-  const handleFilter = (data: task[]) => {
-    let filter = filterStore.filterStr;
-    if (filter === undefined || filter === "") {
-      return data;
-    }
-    const filterData = data?.filter((d: task) => {
-      return d.task_id.includes(filter) || d.data.flowName.includes(filter);
-    });
-    return filterData;
-  };
+
 
   return (
-    <div className="h-full w-full bg-[#EEF1F8] px-5 ">
+    <div className="h-full w-full flex flex-col bg-[#EEF1F8]">
       <div className="px-5">
         <div className="pt-4">
           <Typography
@@ -164,74 +155,77 @@ export default function Card_Mobile({
         </div>
         <hr className="  h-[2px] bg-[#6B739C] mt-4" />
         <Typography component="p" className="text-[#6B739C] mt-4">
-          Count : {data ? handleFilter(data).length : 0} items
+          Count : {data ? commonJs.handleFilter(data, filterStore).length : 0}{" "}
+          items
         </Typography>
       </div>
-      <div className="h-[90%] overflow-auto px-5">
+      <div className="flex flex-col overflow-y-auto px-5 pb-5">
         {data &&
-          handleFilter(data)?.map((task: { [key: string]: any }) => {
-            let colorStatus = "#1D336D";
-            if (task.data.status === "Rejected") {
-              colorStatus = "#FF5555";
-            }
-            let action_item = headerTable.find(
-              (header) => header.field === "Action"
-            );
-            return (
-              <div
-                className="mt-4 flex bg-white gap-4 items-center h-[102px] justify-between"
-                key={task["task_id"]}
-                style={{
-                  borderRadius: "5px",
-                  boxShadow: "4px 4px 10px 0px rgba(0, 0, 0, 0.15)",
-                }}
-              >
-                <div className="flex items-center gap-3">
-                  <Avatar
-                    className="ml-4"
-                    sx={{
-                      width: 46,
-                      height: 46,
-                      border: `2px solid #FFF`,
-                      backgroundColor: "white",
-                      background: "#D8D9DA",
-                      color: "black",
-                    }}
-                    aria-label="recipe"
-                  >
-                    {fn.getStrName(task.data.requester.name)}
-                  </Avatar>
-
-                  <div>
-                    <Typography
-                      component="p"
-                      className="text-[#1D366D] font-semibold"
+          commonJs
+            .handleFilter(data, filterStore)
+            ?.map((task: { [key: string]: any }) => {
+              let colorStatus = "#1D336D";
+              if (task.data.status === "Rejected") {
+                colorStatus = "#FF5555";
+              }
+              let action_item = headerTable.find(
+                (header) => header.field === "Action"
+              );
+              return (
+                <div
+                  className="mt-4 flex shrink-0 bg-white gap-4 items-center h-[102px] justify-between relative"
+                  key={task["task_id"]}
+                  style={{
+                    borderRadius: "5px",
+                    boxShadow: "4px 4px 10px 0px rgba(0, 0, 0, 0.15)",
+                  }}
+                >
+                  <div className="flex items-center gap-3">
+                    <Avatar
+                      className="ml-4"
+                      sx={{
+                        width: 46,
+                        height: 46,
+                        border: `2px solid #FFF`,
+                        backgroundColor: "white",
+                        background: "#D8D9DA",
+                        color: "black",
+                      }}
+                      aria-label="recipe"
                     >
-                      {task.data.flowName === "leave_flow"
-                        ? `E-Leave(${task.data.type.label})`
-                        : task.data.flowName}
-                    </Typography>
-                    <Typography component="p" className="text-[#818181]">
-                      {task.data.requester.name}
-                    </Typography>
-                    <Typography component="p" className="text-[#818181]">
-                      {task.data.requester.company},
-                      {task.data.requester.department},
-                      {task.data.requester.section}
-                    </Typography>
+                      {fn.getStrName(task.data.requester.name)}
+                    </Avatar>
+
+                    <div>
+                      <Typography
+                        component="p"
+                        className="text-[#1D366D] font-semibold"
+                      >
+                        {task.data.flowName === "leave_flow"
+                          ? `E-Leave(${task.data.type.label})`
+                          : task.data.flowName}
+                      </Typography>
+                      <Typography component="p" className="text-[#818181]">
+                        {task.data.requester.name}
+                      </Typography>
+                      <Typography component="p" className="text-[#818181]">
+                        {task.data.requester.company},
+                        {task.data.requester.department},
+                        {task.data.requester.section}
+                      </Typography>
+                    </div>
+                  </div>
+                  <div
+                    onClick={() => {
+                      dialogStore.onOpenDialog({ task, swrResponse });
+                    }}
+                    className="w-12 h-full bg-[#D4E8FC] flex justify-center items-center"
+                  >
+                    <ArrowRight size="24" color="#1976D2" />
                   </div>
                 </div>
-                <div
-                  onClick={() => {
-                    dialogStore.onOpenDialog({ task, swrResponse });
-                  }}
-                  className="w-12 h-full bg-[#D4E8FC] flex justify-center items-center"
-                >
-                  <ArrowRight size="24" color="#1976D2" />
-                </div>
-              </div>
-            );
-          })}
+              );
+            })}
       </div>
     </div>
   );

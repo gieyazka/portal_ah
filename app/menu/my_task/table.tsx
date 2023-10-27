@@ -22,6 +22,7 @@ import {
   Skeleton,
   Stack,
   TextField,
+  Tooltip,
   Typography,
   useAutocomplete,
 } from "@mui/material";
@@ -44,6 +45,7 @@ import Autocomplete from "@mui/material/Autocomplete";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { SWRResponse } from "swr";
 import commonJs from "@/utils/common";
+import fn from "@/utils/common";
 import relativeTime from "dayjs/plugin/relativeTime";
 
 dayjs.extend(relativeTime);
@@ -120,28 +122,7 @@ const RenderExportTable = ({
       };
     });
   };
-  const handleFilter = (data: task[]) => {
-    let filter = filterStore.filterStr;
-    let filterDoc = filterStore.filterDoc;
-    if (
-      (filter === undefined || filter === "") &&
-      (filterDoc === "" || filterDoc === undefined)
-    ) {
-      return data;
-    }
-    const filterData = data?.filter((d: task) => {
-      return (
-        d.data?.flowName === filterDoc ||
-        d.data?.requester?.name
-          ?.toUpperCase()
-          .includes((filter as string).toUpperCase()) ||
-        d.data?.requester?.empid
-          ?.toUpperCase()
-          .includes((filter as string).toUpperCase())
-      );
-    });
-    return filterData;
-  };
+
   const sliceData = (data: {}[]) => {
     const cloneData = [...data];
     return cloneData.slice(tableFooter.start - 1, tableFooter.end);
@@ -157,9 +138,13 @@ const RenderExportTable = ({
     value: item,
   }));
 
-  React.useEffect(() => {
-    filterStore.handleChangePeriod(undefined);
-  }, []);
+  // React.useEffect(() => {
+  //   if (subpath === "action_logs") {
+  //     filterStore.handleChangePeriod(30);
+  //   } else {
+  //     filterStore.handleChangePeriod(undefined);
+  //   }
+  // }, []);
   return (
     <div className="overflow-auto h-full">
       <div className="mb-4 flex items-end justify-between ">
@@ -184,7 +169,7 @@ const RenderExportTable = ({
               onChange={(event: any, newValue: any) => {
                 console.log("", newValue);
                 if (newValue !== null) {
-                  filterStore.handleChangeFilterDoc(newValue.value);
+                  filterStore.handleChangeFilterDoc(newValue);
                 } else {
                   filterStore.handleChangeFilterDoc(undefined);
                 }
@@ -327,9 +312,9 @@ const RenderExportTable = ({
               ? Array.from(new Array(10))
               : data !== undefined && data.length > 0
               ? currentOrder.value === undefined
-                ? sliceData(handleFilter(data))
+                ? sliceData(commonJs.handleFilter(data, filterStore))
                 : sliceData(
-                    handleFilter(
+                    commonJs.handleFilter(
                       _.orderBy(
                         data,
                         (item) =>
@@ -340,95 +325,119 @@ const RenderExportTable = ({
                           ),
                         //@ts-ignore
                         [`${currentOrder.type!}`]
-                      )
+                      ),
+                      filterStore
                     )
                   )
               : []
-            ).map((task: any, i: number) => (
-              <div
-                className={`rounded-xl flex flex-1  h-full relative  content-center  justify-between ${
-                  i % 2 !== 0 ? "bg-white" : "bg-[#F5F5F5]"
-                }`}
-                key={i.toString()}
-              >
-                {headerTable.map((key: any, index: number) => {
-                  if (key.actionClick !== undefined) {
-                    return (
-                      <div
-                        key={key.field}
-                        className={`text-center  flex-1  cursor-pointer flex flex-col justify-center  font-semibold text-[#1976D2] hover:text-white   ${
-                          key.field === "Action" &&
-                          "bg-[#D4E8FC] hover:bg-[#1976D2]"
-                        } rounded-r-lg  py-1`}
-                        onClick={async () => {
-                          key.actionClick({ task });
-                        }}
-                      >
-                        <Typography
-                          component="p"
-                          className="text-xl font-semibold "
-                        >
-                          View
-                        </Typography>
-                        {/* {key.component({ task })} */}
-                      </div>
-                    );
-                  } else {
-                    let checkValue = key.value.split(".");
-                    let value =
-                      task && eval(`task${commonJs.varString(checkValue)}`);
+            ).map((task: any, i: number) => {
+              const checkNeedFileLeave = task
+                ? fn.checkNeedFileLeave(task)
+                : false;
 
-                    if (key.field === "IssueDate") {
-                      value = value && dayjs(value).format("DD/MM/YYYY");
-                    }
-
-                    if (key.field === "Description") {
-                      value =
-                        value && value.length > 100
-                          ? value.slice(0, 97) + "..."
-                          : value;
-                    }
-                    if (key.field === "Pending") {
-                      value = value && dayjs(value).fromNow(true);
-                    }
-                    if (key.field === "Doc.Type") {
-                      if (value === "leave_flow") {
-                        value = "E-Leave";
-                      }
-                    }
-
-                    return (
-                      <div
-                        key={i.toString() + index.toString()}
-                        className={`text-center  flex flex-col  justify-center  ${
-                          !key.width && "flex-1"
-                        }`}
-                        style={{
-                          width: key.width || "auto",
-                        }}
-                      >
-                        {!loading ? (
-                          key.field === "Doc.id" ? (
+              return (
+                <Tooltip
+                  key={i.toString()}
+                  title={
+                    checkNeedFileLeave
+                      ? `Need file for type ${task?.data?.type?.labelTH}`
+                      : undefined
+                  }
+                >
+                  <div
+                    className={`rounded-xl flex flex-1  h-full relative  content-center  justify-between ${
+                      checkNeedFileLeave
+                        ? "bg-[#FF9549] hover:bg-[#FFE5D2] text-black"
+                        : i % 2 !== 0
+                        ? "bg-white"
+                        : "bg-[#F5F5F5]"
+                    }  
+                }  hover:bg-[#1D336D] hover:text-white  `}
+                    key={i.toString()}
+                  >
+                    {headerTable.map((key: any, index: number) => {
+                      if (key.actionClick !== undefined) {
+                        return (
+                          <div
+                            key={key.field}
+                            className={`text-center  flex-1  cursor-pointer flex flex-col justify-center  font-semibold text-[#1976D2] hover:text-white   ${
+                              key.field === "Action" &&
+                              "bg-[#D4E8FC] hover:bg-[#1976D2]"
+                            } rounded-r-lg  py-1`}
+                            onClick={async () => {
+                              key.actionClick({ task });
+                            }}
+                          >
                             <Typography
                               component="p"
-                              className="text-base whitespace-nowrap "
+                              className="text-xl font-semibold "
                             >
-                              {value}
+                              View
                             </Typography>
-                          ) : (
-                            <Typography component="p" className="text-base ">
-                              {value}
-                            </Typography>
-                          )
-                        ) : (
-                          <Skeleton />
-                        )}
-                      </div>
-                    );
-                  }
-                })}
-              </div>
-            ))}
+                            {/* {key.component({ task })} */}
+                          </div>
+                        );
+                      } else {
+                        let checkValue = key.value.split(".");
+                        let value =
+                          task && eval(`task${commonJs.varString(checkValue)}`);
+
+                        if (key.field === "IssueDate") {
+                          value = value && dayjs(value).format("DD/MM/YYYY");
+                        }
+
+                        if (key.field === "Description") {
+                          value =
+                            value && value.length > 100
+                              ? value.slice(0, 97) + "..."
+                              : value;
+                        }
+                        if (key.field === "Pending") {
+                          value = value && dayjs(value).fromNow(true);
+                        }
+                        if (key.field === "Doc.Type") {
+                          if (value === "leave_flow") {
+                            value = "E-Leave";
+                          }
+                        }
+
+                        return (
+                          <div
+                            key={i.toString() + index.toString()}
+                            className={`text-center  flex flex-col  justify-center  ${
+                              !key.width && "flex-1"
+                            }`}
+                            style={{
+                              width: key.width || "auto",
+                            }}
+                          >
+                            {!loading ? (
+                              key.field === "Doc.id" ? (
+                                <Typography
+                                  component="p"
+                                  className="text-base whitespace-nowrap "
+                                >
+                                  {value}
+                                </Typography>
+                              ) : (
+                                <Typography
+                                  component="p"
+                                  className="text-base "
+                                >
+                                  {value}
+                                </Typography>
+                              )
+                            ) : (
+                              <Skeleton />
+                            )}
+                          </div>
+                        );
+                      }
+                    })}
+                  </div>
+                </Tooltip>
+              );
+            })}
           </div>
         </div>
       </div>

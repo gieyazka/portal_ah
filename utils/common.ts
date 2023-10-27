@@ -1,5 +1,5 @@
 import _, { first, isArray } from "lodash";
-import { approver, previewStore, task } from "@/types/next-auth";
+import { approver, filterStore, previewStore, task } from "@/types/next-auth";
 import { useEffect, useState } from "react";
 
 import { Session } from 'next-auth';
@@ -7,6 +7,7 @@ import Swal from "sweetalert2";
 import _apiFn from '@/utils/apiFn';
 import axios from "axios";
 import convert from "xml-js"
+import dayjs from "dayjs";
 
 const varString = (varData: string[]) => {
     let newString: string | undefined = "";
@@ -37,8 +38,7 @@ const getStrName = (fullname: string) => {
     if (fullname === undefined) {
         return ""
     }
-    let nameParts = fullname.replace("  ", " ").split(".");
-
+    let nameParts = fullname.replace(". ", ".").replace("  ", " ").split(".");
     if (nameParts.length > 1) {
         nameParts = nameParts[1].split(" ")
     } else {
@@ -52,62 +52,15 @@ const getStrName = (fullname: string) => {
 
 const getByCondition: any = (allTask: any, gatewayArr: any, condition: boolean | undefined, taskData: any) => {
 
-    let gatewayCondition = undefined
-    let useData = undefined
-    let isDo = true
-    // for (let index = 0; index < gatewayArr['bpmn2:outgoing'].length; index++) {
-    //     const data = gatewayArr['bpmn2:outgoing'][index];
-    //     for (let index = 0; index < allTask.length; index++) {
-    //         const d = allTask[index];
-    //         if (d._attributes.id === data['_text']) {
-
-    //             gatewayCondition = d['bpmn2:conditionExpression']
-    //         }
-    //     }
-    //     if (gatewayArr['_attributes'].name === "check_resend") {
-    //         if (gatewayCondition['_text'].includes("false") && taskData.data.status === 'Rejected') {
-    //             // return true
-    //             useData = data
-    //             break
-
-    //         }
-    //         continue
-    //     }
-    //     if (gatewayCondition['_text'].includes(condition?.toString())) {
-    //         useData = data
-    //         break
-    //         // return true
-    //     }
-
-
-    //     else {
-    //         continue
-    //     }
-    // }
-    // console.log("useData",useData);
-    // return useData
-    // console.log(33, gatewayCondition);
     return gatewayArr['bpmn2:outgoing'].find((data: { [key: string]: any }) => {
-        // console.log(2222, data);
         let gatewayCondition = allTask.find((d: any) => {
-            // console.log(22, d._attributes.id, data['_text']);
 
             return d._attributes.id === data['_text']
         })['bpmn2:conditionExpression']
-        // console.log(21, gatewayCondition);
-        // if (gatewayArr['_attributes'].name === "check_resend") {
-        //     // console.log("check_resend", isDo, gatewayCondition['_text']);
-        //     if (gatewayCondition['_text'].includes("false") && taskData.data.status === 'Rejected' && isDo === 1) {
-        //         // return true
-        //     }
-        //     return false
-        // }
+
         if (gatewayCondition['_text'].includes(condition?.toString())) {
             return true
-
         }
-
-
         else {
             return false
         }
@@ -200,6 +153,34 @@ const getNextApprover = (task: { [key: string]: any } | undefined) => {
 
 }
 
+
+const renderLeaveData = (leaveData: any) => {
+    const _leaveData = _.orderBy(leaveData, ["date"], ["asc"]);
+
+    const lastIndex = _leaveData.length - 1;
+
+    if (_leaveData.length > 1) {
+        if (
+            dayjs(_leaveData[0].date).isSame(
+                dayjs(_leaveData[lastIndex].date),
+                "month"
+            )
+        ) {
+            return `${dayjs(_leaveData[0].date).format("DD")}-${dayjs(
+                _leaveData[lastIndex].date
+            ).format("DD")}/${dayjs(_leaveData[0].date).format("MM/YYYY")}`;
+        } else {
+            return `${dayjs(_leaveData[0].date).format("DD/MM/YYYY")}-${dayjs(
+                _leaveData[lastIndex].date
+            ).format("DD/MM/YYYY")}`;
+        }
+    } else {
+        return `${dayjs(_leaveData[0].date).format("DD/MM/YYYY")}`;
+    }
+};
+
+
+
 const isImageFile = (fileName: string) => {
     const imageExtensions = [
         ".jpg",
@@ -237,7 +218,7 @@ const useWidth = () => {
 
 
 const checkCanAction = (userSession: Session, task: task) => {
-    console.log("in Can action", userSession, task);
+    // console.log("in Can action", userSession, task);
 
     if (userSession !== undefined && task !== undefined) {
         const user = userSession.user
@@ -245,15 +226,39 @@ const checkCanAction = (userSession: Session, task: task) => {
         if (currentApprover == null) {
             return false
         }
-        const matchFields = ['company', 'section', 'department', 'level', 'sub_section'];
+        console.log('', currentApprover)
+        const matchFields = ['company', 'department', 'level'];
         //@ts-ignore
-        const matches = matchFields.every((field: string) => currentApprover[field] === user[field]) || user.username === currentApprover.empid
+        const matches = matchFields.every((field: string) => currentApprover[field] === user[field] && user.level !== null) || user.email?.toLowerCase() === currentApprover.email?.toLowerCase()
         return matches;
     } else {
         return false
     }
 }
-
+const handleFilter = (data: task[], filterStore: filterStore) => {
+    let filter = filterStore.filterStr;
+    let filterDoc = filterStore.filterDoc?.value;
+    if ((filter === undefined || filter === "") && filterDoc === undefined) {
+        return data;
+    }
+    const filterData = data?.filter((d: task) => {
+        const checkFlow = d.data?.flowName === filterDoc;
+        if (filter === undefined || filter === "") {
+            return checkFlow;
+        }
+        return (
+            checkFlow ||
+            d.data?.requester?.name
+                ?.toUpperCase()
+                .includes((filter as string).toUpperCase()) ||
+            d.data?.requester?.empid
+                ?.toUpperCase()
+                .includes((filter as string).toUpperCase())
+        );
+    });
+    console.log("filterData", filterData);
+    return filterData;
+};
 const getBase64 = (file: Blob) =>
     new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -363,7 +368,7 @@ const onPreviewFile = async (file: string | Blob, type: string, storePreview: pr
     }
 
     if (type === "image") {
-
+        console.log('389', file)
         storePreview.onShowBackDrop(
             typeof file === "string" ? `${process.env.NEXT_PUBLIC_Strapi}${file}` : URL.createObjectURL(file),
             "image"
@@ -385,9 +390,32 @@ function objectToQueryString(obj: any) {
         .join('&');
 }
 
+
+const checkNeedFileLeave = (task: any) => {
+    const dataLeaveType = task?.data?.type?.value;
+    if (
+        dataLeaveType === "maternity" ||
+        dataLeaveType === "ordination" ||
+        dataLeaveType === "militaryService" ||
+        dataLeaveType === "annualSpecial" ||
+        dataLeaveType === "personalSpecial"
+    ) {
+        return task.data.filesURL === null || task.data.filesURL.length === 0;
+    }
+
+    return false;
+};
+
+const getDiffDate = (date: string) => {
+    const getDate = dayjs(date, "YYYY-MM-DD")
+    const yearDiff = dayjs().diff(getDate, "y")
+    const monthsDiff = dayjs().diff(getDate, 'M') % 12;
+    console.log('monthsDiff', dayjs().diff(getDate, 'M'), monthsDiff)
+    return `${yearDiff} years ${monthsDiff == 0 ? "" : monthsDiff + " months"} `
+}
 const fn = {
-    callToast, onPreviewFile, objectToQueryString,
-    getStrName, varString, getNextApprover, isImageFile, checkString, useWidth, checkCanAction, getBase64, deleteImage, removeAttrFromStrapi
+    renderLeaveData, getDiffDate, checkNeedFileLeave,
+    callToast, onPreviewFile, objectToQueryString, handleFilter, getStrName, varString, getNextApprover, isImageFile, checkString, useWidth, checkCanAction, getBase64, deleteImage, removeAttrFromStrapi
 }
 
 export default fn
