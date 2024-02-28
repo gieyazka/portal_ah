@@ -42,7 +42,7 @@ const Leave_Flow = (props: {
           </div>
           <div className="w-1/2 flex flex-col items-stretch gap-2 relative ">
             <div className="flex-grow relative ">
-              <Requester requester={task?.data.requester} />
+              <Requester task={task} requester={task?.data.requester} />
             </div>
             <div className="flex-grow relative">
               <FileAttach task={task} />
@@ -54,12 +54,12 @@ const Leave_Flow = (props: {
   } else {
     return (
       <div className="h-full w-full flex flex-col gap-3">
-        <RequesterMobile requester={task?.data.requester} />
+        <RequesterMobile task={task} requester={task.data.requester}  />
         <LeaveDetailMobile
           getTileClassName={getTileClassName}
           task={task}
           storePreview={storePreview}
-          leaveDaySwr={leaveDay}
+          // leaveDaySwr={leaveDay}
         />
         <FileAttach task={task} />
       </div>

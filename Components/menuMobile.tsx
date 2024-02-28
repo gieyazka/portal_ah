@@ -37,7 +37,6 @@ export default function AccountMenu({
   const handleClose = () => {
     setAnchorEl(null);
   };
-  console.log("MenuData", MenuData);
   return (
     <React.Fragment>
       <IconButton

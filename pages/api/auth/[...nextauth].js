@@ -209,16 +209,22 @@ export const authOptions = {
         jwt: async ({ token, user, profile }) => {
             const isSignIn = user ? true : false;
             if (isSignIn) {
-                console.log('profile', profile)
-                const res = await _fnApi.getUserData(profile.email)
+                console.log('profile get Principal', profile)
+                // const res = await _fnApi.getUserDataByPrincipalName("vithiwat.r@aapico.com")
+                // console.log('214',res)
+                // const res = await _fnApi.getUserDataByPrincipalName(profile.userPrincipalName)
+                const res = await _fnApi.getUserDataByPrincipalName("watthana.m@aapico.com")
                 const data = res.data
-                token.email = profile.email
+                const resLdap = await _fnApi.getLDAPDataByEmpID(data.employee.empid)
+
+                token.email = data.employee.email
+                // token.email = "watthana.m@aapico.com"
                 token.rule = data.rule ?? null
                 token.level = data.hierachy?.level?.level ?? null
                 token.priority = data.hierachy?.level?.priority ?? null
                 token.section = data.hierachy?.section?.name ?? null
-                token.department = data.hierachy?.section?.department?.abbreviation ?? null
-                token.company = data.hierachy?.section?.department?.company?.abbreviation ?? null
+                // token.department = data.hierachy?.section?.department?.abbreviation ?? null
+                // token.company = data.hierachy?.section?.department?.company?.abbreviation ?? null
                 token.empid = data.employee.empid,
                     token.username = data.employee.empid
                 token.fullName = `${data.employee.prefix ? data.employee.prefix + "." : ""}${data.employee.firstName} ${data.employee.lastName}`
@@ -227,17 +233,19 @@ export const authOptions = {
                 token.prefix = data.employee.prefix
                 token.position = data.employee.position ?? null
                 //custom agr add here then ass in session
-                if (data.hierachy === null) {
-                    const resLdap = await _fnApi.getLDAPData(data.employee.email)
-                    token.department = resLdap.data?.employee?.department ?? null
-                    token.company = resLdap.data.employee?.company ?? null
-                }
+                // if (data.hierachy === null) {
+                token.department = resLdap.data?.employee?.department ?? null
+                token.company = resLdap.data.employee?.company ?? null
+                token.ldapUser = resLdap.data.employee?.username ?? null
+                token.userWithoutCompany = resLdap.data.employee?.empid ?? null
+                // }
             }
             return Promise.resolve(token);
         },
         session: async ({ session, token }) => {
             //add custom agr here
             session.user.id = token.id;
+            session.user.email = token.email;
             session.user.jwt = token.jwt;
             session.user.rule = token.rule
             session.user.level = token.level
@@ -252,6 +260,8 @@ export const authOptions = {
             session.user.fullName = token.fullName
             session.user.prefix = token.prefix
             session.user.position = token.position
+            session.user.ldapUser = token.ldapUser
+            session.user.userWithoutCompany = token.userWithoutCompany
             return Promise.resolve(session);
         },
     },

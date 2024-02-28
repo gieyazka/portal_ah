@@ -45,7 +45,6 @@ export default function SubComponent(props: any) {
   const lastPath = splitPath[splitPath.length - 1];
   const [value, setValue] = React.useState("1");
   const user = _apiFn.useUser();
-console.log('user',user)
   const dialogStore = useDialogStore();
 
   const [realData, setRealData] = React.useState();
@@ -84,7 +83,7 @@ console.log('user',user)
   //   }
   // }, [filterStore.isFetch, mytask.data]);
   const headerTable: headerTable[] = [
-    // { field: "Doc.id", value: "task_id" },
+{ field: "Doc.id", label: "EF ID", value: "task_id", width: 150},
     { label: "Doc.Type", field: "Doc.Type", value: "data.flowName" },
     {
       label: "Emp.ID",

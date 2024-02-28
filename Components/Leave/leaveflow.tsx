@@ -28,22 +28,14 @@ const LeaveDetail = (props: {
   }) => string | undefined;
   task: task;
   storePreview: previewStore;
-  leaveDaySwr: SWRResponse<any, any, any>;
 }) => {
   const getTileClassName = props.getTileClassName;
   const [calendarMonth, setCalendarMonth] = React.useState(dayjs());
-  const leaveDay = props.leaveDaySwr;
   const task: task = props.task;
   const storePreview: previewStore = props.storePreview;
   const loadingStore = useLoading();
   const [value, onChange] = React.useState(new Date());
-  React.useEffect(() => {
-    if (leaveDay.isLoading) {
-      loadingStore.setLoading(true);
-    } else {
-      loadingStore.setLoading(false);
-    }
-  }, [leaveDay.isLoading]);
+
   const uniqMonth: string[] = _.uniq(
     task.data?.leaveData?.map((d: { date: Date }) => dayjs(d.date).format("MM"))
   );

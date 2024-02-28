@@ -15,7 +15,7 @@ import {
 } from "iconsax-react";
 import { menuItem, subMenu } from "@/types/next-auth";
 
-import Job_Pending from "./my_action/job_pending";
+import Job_Pending from "./myAction/job_pending";
 
 const data: menuItem[] = [
   {

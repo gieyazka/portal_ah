@@ -29,6 +29,7 @@ import {
 } from "@mui/icons-material";
 import { approver, approverList, task } from "@/types/next-auth";
 
+import _ from "lodash";
 import _apiFn from "@/utils/apiFn";
 import dayjs from "dayjs";
 import fn from "@/utils/common";
@@ -193,42 +194,53 @@ const ApproverStep = (props: { task: task }) => {
       return <div>No data</div>;
     }
     // console.log('currentPosition',currentPosition)
+    let newCurrentApprover = _.cloneDeep(task.data.currentApprover);
+    const cloneApprover = _.cloneDeep(task.data.currentApprover);
+    if (_.isArray(task.data.currentApprover)) {
+      newCurrentApprover = newCurrentApprover[0];
+      let newName = "";
+      for (let index = 0; index < cloneApprover.length; index++) {
+        const element = cloneApprover[index];
+        if (
+          element.email !== "pokkate.e@aapico.com" &&
+          element.email !== "sawanon.w@aapico.com"
+        ) {
+          newName += `${index !== 0 ? "\n" : ""}${element.name} `;
+        }
+      }
+
+      newCurrentApprover.name = newName;
+    }
     return (
       <>
         {currentPosition.data !== undefined &&
-        task.data.currentApprover.name === undefined ? (
+        newCurrentApprover === undefined ? (
           <p>
             {currentPosition.data.data.find(
-              (d: any) => d.attributes.level === task.data.currentApprover.level
+              (d: any) => d.attributes.level === newCurrentApprover.level
             )?.attributes?.position ?? ""}
           </p>
         ) : (
-          <>
-            <div className=" text-[#818181] font-semibold ">
+          <div className=" text-[#818181] font-semibold ">
+            <Typography component="p" className=" text-sm whitespace-pre-line ">
+              {newCurrentApprover.name}
+            </Typography>
+            <Typography component="p" className=" text-sm ">
+              {" "}
+              {newCurrentApprover.position}
+            </Typography>
+            {viewStore.isMd && (
               <Typography component="p" className=" text-sm ">
-                {task.data.currentApprover.name}
+                Department :
+                {fn.checkString(undefined, newCurrentApprover.company, " ")}
+                {fn.checkString(
+                  undefined,
+                  newCurrentApprover.department,
+                  " : "
+                )}
               </Typography>
-              <Typography component="p" className=" text-sm ">
-                {" "}
-                {task.data.currentApprover.position}
-              </Typography>
-              {viewStore.isMd && (
-                <Typography component="p" className=" text-sm ">
-                  Department :
-                  {fn.checkString(
-                    undefined,
-                    task.data.currentApprover.company,
-                    " "
-                  )}
-                  {fn.checkString(
-                    undefined,
-                    task.data.currentApprover.department,
-                    " : "
-                  )}
-                </Typography>
-              )}
-            </div>
-          </>
+            )}
+          </div>
         )}
       </>
     );
@@ -248,10 +260,9 @@ const ApproverStep = (props: { task: task }) => {
     // console.log("nextAppover", nextAppover);
     return (
       <div>
-     
         {task.data.currentApprover ? (
           <>
-             <p>{curPOs ? curPOs?.attributes?.position : nextAppover.level}</p>
+            <p>{curPOs ? curPOs?.attributes?.position : nextAppover.level}</p>
             <p>
               {fn.checkString(nextAppover.section, undefined, "")}
               {fn.checkString(nextAppover.company, undefined, ":")}
@@ -295,7 +306,7 @@ const ApproverStep = (props: { task: task }) => {
                   component="p"
                   className="text-xl  py-2  text-[#1976D2]  font-bold px-2"
                 >
-                  Flow Process
+                  Flow Approver
                 </Typography>
               </AccordionSummary>
               <AccordionDetails className="p-0 flex justify-center">
@@ -308,10 +319,11 @@ const ApproverStep = (props: { task: task }) => {
                             optional?: React.ReactNode;
                             error?: boolean;
                           } = {};
-
                           if (d.action === "Rejected") {
                             labelProps.error = true;
                           }
+                          const oldApprover = d["0"] ? { ...d["0"], ...d } : d;
+
                           return (
                             <Step
                               key={"div" + i}
@@ -352,25 +364,27 @@ const ApproverStep = (props: { task: task }) => {
                                     component="p"
                                     className={`
                                      font-semibold ${
-                                       d.action === "Rejected"
+                                       oldApprover.action === "Rejected"
                                          ? "text-[#A43030]"
                                          : "text-[#235F2A]"
                                      }`}
                                   >
-                                    {d.action}
+                                    {oldApprover.action}
                                     <Typography
                                       component="span"
                                       className="text-[#818181]"
                                     >
-                                      {" "}
-                                      @{dayjs(d.date).format("DD/MM/YYYY")}
+                                      @
+                                      {dayjs(oldApprover.date).format(
+                                        "DD/MM/YYYY"
+                                      )}
                                     </Typography>
                                   </Typography>
                                   <Typography
                                     component="p"
                                     className="text-[#818181]"
                                   >
-                                    {d.name}
+                                    {oldApprover.name}
                                   </Typography>
                                 </div>
                               </StepLabel>
@@ -394,7 +408,9 @@ const ApproverStep = (props: { task: task }) => {
                               component="p"
                               className="text-[#818181]"
                             >
-                              {task.data.currentApprover.name}
+                              {task.data.currentApprover.length > 0
+                                ? task.data.currentApprover[0].name
+                                : task.data.currentApprover.name}
                             </Typography>
                           </div>
                         </StepLabel>
@@ -448,10 +464,25 @@ const ApproverStep = (props: { task: task }) => {
     );
   }
   return (
-    <>
+    <div
+      className=" rounded-[10px] relative h-full   flex flex-col bg-white "
+      style={{
+        boxShadow: " 4px 4px 10px 0px rgba(0, 0, 0, 0.15)",
+      }}
+    >
+      <Typography
+        component="p"
+        className="text-xl bg-[#D4E8FC] py-2 rounded-t-[10px] text-[#1976D2]  font-bold px-2"
+      >
+        Organization - {task.data.requester.company} {`>> `}{" "}
+        {task.data.requester.department}{" "}
+        {task.data.requester.section && ` >> ${task.data.requester.section}`}{" "}
+        {task.data.requester.sub_section &&
+          ` >> ${task.data.requester.sub_section}`}
+      </Typography>
       {task !== undefined && (
         <Stepper
-          className=" w-auto font-[Bai Jamjuree]"
+          className=" w-auto font-[Bai Jamjuree]  my-2 py-8  px-8"
           activeStep={current}
           alternativeLabel
           connector={<ColorlibConnector />}
@@ -502,6 +533,7 @@ const ApproverStep = (props: { task: task }) => {
               if (isReject) {
                 labelProps.error = true;
               }
+              const oldApprover = d["0"] ? { ...d["0"], ...d } : d;
               return (
                 <Step
                   key={"div" + i}
@@ -524,19 +556,22 @@ const ApproverStep = (props: { task: task }) => {
                   >
                     <div className=" text-[#818181] font-semibold text-sm  ">
                       <Typography className=" text-sm " component="p">
-                        {d.name}
+                        {oldApprover.name}
                       </Typography>
                       <Typography className=" text-sm " component="p">
-                        {d.position}
+                        {oldApprover.position}
                       </Typography>
                       {viewStore.isMd && (
                         <>
                           <Typography className=" text-sm " component="p">
-                            Department : {d.company} : {d.department}
+                            Department : {oldApprover.company} :{" "}
+                            {oldApprover.department}
                           </Typography>
 
                           <Typography className=" text-sm " component="p">
-                            {dayjs(d.date).format("DD/MM/YYYY @HH:mm:ss")}
+                            {dayjs(oldApprover.date).format(
+                              "DD/MM/YYYY @HH:mm:ss"
+                            )}
                           </Typography>
                         </>
                       )}
@@ -582,7 +617,7 @@ const ApproverStep = (props: { task: task }) => {
           </Step>
         </Stepper>
       )}
-    </>
+    </div>
   );
 };
 

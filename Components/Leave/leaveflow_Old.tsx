@@ -159,7 +159,7 @@ const LeaveDetail = (props: {
                               <div
                                 onClick={async () => {
                                   const res = await axios.get(
-                                    `${process.env.NEXT_PUBLIC_Strapi}${file}`,
+                                    `${process.env.NEXT_PUBLIC_Strapi_Org}${file}`,
                                     {
                                       responseType: "blob",
                                     }
@@ -190,7 +190,7 @@ const LeaveDetail = (props: {
                                   var link = document.createElement('a');
 
                                   // Set download attribute and file URL
-                                  link.setAttribute('href', `${process.env.NEXT_PUBLIC_Strapi}${file}`);
+                                  link.setAttribute('href', `${process.env.NEXT_PUBLIC_Strapi_Org}${file}`);
                                   link.click();
                             
                                 }}
@@ -209,11 +209,11 @@ const LeaveDetail = (props: {
                             blurDataURL="/assets/image-placeholder.jpg"
                             onClick={() =>
                               storePreview.onShowBackDrop(
-                                `${process.env.NEXT_PUBLIC_Strapi}${file}`,
+                                `${process.env.NEXT_PUBLIC_Strapi_Org}${file}`,
                                 "image"
                               )
                             }
-                            src={`${process.env.NEXT_PUBLIC_Strapi}${file}`}
+                            src={`${process.env.NEXT_PUBLIC_Strapi_Org}${file}`}
                             // className='w-full h-full'
                             fill
                             style={{

@@ -21,7 +21,6 @@ const FilePreview = (props: { approverData: approverList; index: number }) => {
   React.useEffect(() => {
     const fetchData = async () => {
       try {
-        console.log("19", approverData?.filesURL);
         const newData = await Promise.all(
           approverData?.filesURL?.map(async (d: string) => {
             const response = await _apiFn.getFileInfo(d);

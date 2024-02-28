@@ -105,7 +105,6 @@ export default function Card_Mobile({
         </div> */}
         </div>
       </div>
-      {console.log(handleFilter(data))}
       {data &&
         handleFilter(data)?.map((task: { [key: string]: any }) => {
           let colorStatus = "#1D336D";

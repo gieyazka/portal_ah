@@ -66,7 +66,6 @@ export default function SignIn({}) {
 
   React.useEffect(() => {
     getProviders().then((d) => {
-      console.log("provider", d);
     });
   });
 
@@ -200,7 +199,6 @@ export default function SignIn({}) {
                 })
                   .then((res) => res)
                   .catch((error) => {
-                    console.log("error", error);
                     return error;
                   });
               }}

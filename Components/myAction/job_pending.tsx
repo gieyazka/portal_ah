@@ -1,27 +1,22 @@
 "use client";
 // import UserData from "./userData";
 
-import { Box, IconButton, Tab, Typography } from "@mui/material";
+import { Box, Button, IconButton, Tab, Typography } from "@mui/material";
+import { PermIdentity, Visibility } from "@mui/icons-material";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import { headerTable, userData } from "@/types/next-auth";
-import {
-  useActionDialogStore,
-  useDialogStore,
-  useFilterStore,
-  useSnackbarStore,
-  useViewStore,
-} from "../../../store/store";
+import { useActionDialogStore, useDialogStore, useFilterStore, useSnackbarStore, useViewStore } from "../../store/store";
 import { usePathname, useRouter } from "next/navigation";
 
 import Card_Mobile from "./card_mobile";
 import React from "react";
 import RenderTable from "./table";
 import ViewSickFlow from "@/Components/action_component/viewsickflow";
-import { Visibility } from "@mui/icons-material";
+import _ from "lodash";
 import _apiFn from "@/utils/apiFn";
 import menuData from "../menuItem";
 
-export default function Action_log(props: any) {
+export default function Job_Pending(props: any) {
   const filterStore = useFilterStore();
   const viewStore = useViewStore();
   const dialogStore = useDialogStore();
@@ -34,26 +29,30 @@ export default function Action_log(props: any) {
   const lastPath = splitPath[splitPath.length - 1];
   const [value, setValue] = React.useState("1");
   const user = _apiFn.useUser();
+
   const [realData, setRealData] = React.useState();
-
   let subpath = props.currentSubPath;
+  let status = subpath === "in_process" ? "Waiting" : subpath === "reject" ? "Rejected" : "Success";
 
-  let mytask = _apiFn.useAction_logs({
+  let mytask = _apiFn.useCurrentTask({
     user: user?.data?.user,
     filterStore: filterStore,
   });
+
   React.useMemo(() => {
-    if (filterStore.isFetch) {
-      setRealData(mytask.data);
-    }
+    setRealData((prev: any) => {
+      let newArr = [];
+      if (mytask.data) {
+        newArr = _.cloneDeep(mytask.data);
+      }
+
+      return newArr;
+    });
   }, [filterStore.isFetch, mytask.data]);
-
-
-
+  // }, [filterStore.isFetch, mytask.data, carbookingTask.data]);
   const headerTable: headerTable[] = [
-    // { field: "Doc.id", value: "task_id" },
+{ field: "Doc.id", label: "EF ID", value: "task_id", width: 150},
     { label: "Doc.Type", field: "Doc.Type", value: "data.flowName" },
-
     {
       label: "Emp.ID",
       field: "Emp_id",
@@ -70,15 +69,8 @@ export default function Action_log(props: any) {
       label: "Description",
       field: "Description",
       value: "data.reason",
-      component: ({ task, iconStyle }: { task: any; iconStyle?: string }) => (
-        <div>
-          {task.data.flowName === "leave_flow"
-            ? task.data.type.label
-            : task.data.reason}
-        </div>
-      ),
     },
-    { label: "IssueDate", field: "IssueDate", value: "issueDate" },
+    { label: "Issue Date", field: "IssueDate", value: "issueDate" },
     { label: "Req.Status", field: "status", value: "data.status" },
     // { field: "Pending", value: "data.lastUpdate" },
 
@@ -91,26 +83,13 @@ export default function Action_log(props: any) {
         //@ts-ignore
         dialogStore.onOpenDialog({ task, swrResponse: mytask });
       },
-      component: ({ task, iconStyle }: { task: any; iconStyle?: string }) => {
-        return (
-          <div>
-            <div className="flex justify-center">
-              {task.data.flowName === "leave_flow" &&
-                ViewSickFlow({
-                  task,
-                  dialogStore,
-                  swrResponse: mytask,
-                  iconStyle,
-                })}
-            </div>
-          </div>
-        );
-      },
+
+      component: ({ task, iconStyle }: { task: any; iconStyle?: string }) => ViewSickFlow({ task, dialogStore, swrResponse: mytask, iconStyle }),
     },
   ];
   if (!viewStore.isMd) {
     return (
-      <div className="w-full h-full">
+      <div className='w-full h-full '>
         <Card_Mobile
           headerTable={headerTable}
           loading={mytask.isLoading}
@@ -120,10 +99,10 @@ export default function Action_log(props: any) {
       </div>
     );
   }
+
   return (
-    <div className=" relative overflow-auto  h-full ">
+    <div className=' relative overflow-auto h-full  '>
       <RenderTable
-        subpath={subpath}
         headerTable={headerTable}
         loading={loading}
         data={realData}

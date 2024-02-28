@@ -33,22 +33,14 @@ const LeaveDetail = (props: {
   }) => string | undefined;
   task: task;
   storePreview: previewStore;
-  leaveDaySwr: SWRResponse<any, any, any>;
 }) => {
   const [calendarMonth, setCalendarMonth] = React.useState(dayjs());
-  const leaveDay = props.leaveDaySwr;
   const task: task = props.task;
   const getTileClassName = props.getTileClassName;
   const storePreview: previewStore = props.storePreview;
   const loadingStore = useLoading();
   const [value, onChange] = React.useState(new Date());
-  React.useEffect(() => {
-    if (leaveDay.isLoading) {
-      loadingStore.setLoading(true);
-    } else {
-      loadingStore.setLoading(false);
-    }
-  }, [leaveDay.isLoading]);
+
   const uniqMonth: string[] = _.uniq(
     task.data?.leaveData?.map((d: { date: Date }) => dayjs(d.date).format("MM"))
   );
@@ -101,15 +93,6 @@ const LeaveDetail = (props: {
                     task.data.leaveData &&
                     (_.first(task.data.leaveData) as any).date
                   }
-                  // className=" text-sm h-auto border-0"
-                  // showNavigation={false}
-                  // activeStartDate={dayjs(month, "MM").toDate()}
-                  // onChange={onChange}
-                  // minDate={dayjs(month, "MM").startOf("month").toDate()}
-                  // maxDate={dayjs(month, "MM").endOf("month").toDate()}
-                  // tileDisabled={({date}) => date.getDate()===date1}
-                  // nextLabel={null}
-                  // prevLabel={null}
                   onActiveStartDateChange={({
                     action,
                     activeStartDate,

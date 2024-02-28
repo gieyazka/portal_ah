@@ -1,5 +1,7 @@
 import * as React from "react";
 
+import { MenuItem, Select } from "@mui/material";
+
 import { Autocomplete } from "@mui/lab";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -58,7 +60,40 @@ export default function TemporaryDrawer() {
                     </label>
                   </div>
                   <div className="flex-1">
-                    <select
+                    <Select
+                      onChange={(e) => {
+                        if (e.target.value !== null) {
+                          filterStore.handleChangePeriod(
+                            parseInt(e.target.value)
+                          );
+                          // filterStore.handleChangeEndDate(e);
+                        }
+                      }}
+                      sx={{
+                        "& > fieldset": {
+                          borderRadius: "10px",
+                          border: "3px solid  #D9DAE6",
+                        },
+                      }}
+                      style={{
+                        height: "46px",
+
+                        background: " #FFF",
+                        boxShadow: "4px 4px 10px 0px rgba(0, 0, 0, 0.15)",
+                      }}
+                      className="text-base text-[#1D366D] py-0 focus:bg-red-500     font-semibold w-full mt-[5px]  rounded-lg focus:ring-blue-500 focus:border-blue-500   dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      value={filterStore.period}
+                    >
+                      <MenuItem value={0}>Select Period</MenuItem>
+                      <MenuItem value={3}>Last 3 days</MenuItem>
+                      <MenuItem value={7}>Last 7 days</MenuItem>
+                      <MenuItem value={15}>Last 15 days</MenuItem>
+                      <MenuItem value={30}>Last 1 months</MenuItem>
+                      <MenuItem value={60}>Last 2 months</MenuItem>
+                      <MenuItem value={180}>Last 6 months</MenuItem>
+                      <MenuItem value={365}>Last 1 year</MenuItem>
+                    </Select>
+                    {/* <select
                       id="period"
                       onChange={(e) => {
                         if (e.target.value !== null) {
@@ -86,7 +121,7 @@ export default function TemporaryDrawer() {
                       <option value={60}>Last 2 months</option>
                       <option value={180}>Last 6 months</option>
                       <option value={365}>Last 1 year</option>
-                    </select>
+                    </select> */}
                   </div>
                 </div>
                 <div className="flex gap-2 items-center">

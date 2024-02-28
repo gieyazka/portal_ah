@@ -1,6 +1,9 @@
+import type { Metadata } from "next";
+import NextHead from "next/head";
+
 export default function Head() {
   return (
-    <>
+    <NextHead>
       <meta name="E-Workflow Portal" content="PWA App" />
 
       <link
@@ -45,6 +48,6 @@ export default function Head() {
       <meta content="width=device-width, initial-scale=1" name="viewport" />
       <link rel="apple-touch-icon" href="/assets/icon_portal.png"></link>
       <link rel="icon" href="/assets/icon_portal.png" />
-    </>
+    </NextHead>
   );
 }

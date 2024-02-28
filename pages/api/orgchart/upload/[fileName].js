@@ -29,10 +29,9 @@ const handler = (async (req, res) => {
         const file = req.file
         file.originalname = Buffer.from(file.originalname, 'latin1').toString('utf8')
         send_formData.append(`files`, req.file.buffer, req.file.originalname);
-        console.log('file', file)
         const resData = await axios({
             method: "POST",
-            url: `${process.env.NEXT_PUBLIC_Strapi}/api/upload`,
+            url: `${process.env.NEXT_PUBLIC_Strapi_Org}/upload`,
             data: send_formData,
             headers: { "Content-Type": "multipart/form-data" },
             validateStatus: function (status) {
@@ -50,11 +49,10 @@ const handler = (async (req, res) => {
                 ? "image"
                 : "file";
 
-        console.log('checkFile', checkFile)
         if (checkFile === "image" || checkFile === "pdf") {
             const resData = await axios({
                 method: "GET",
-                url: `${process.env.NEXT_PUBLIC_Strapi}/uploads/${fileName}`,
+                url: `${process.env.NEXT_PUBLIC_Strapi_Org}/uploads/${fileName}`,
                 // responseType: "blob",
                 responseType: "stream",
                 validateStatus: function (status) {
@@ -91,7 +89,7 @@ const handler = (async (req, res) => {
 
             const resData = await axios({
                 method: "GET",
-                url: `${process.env.NEXT_PUBLIC_Strapi}/uploads/${fileName}`,
+                url: `${process.env.NEXT_PUBLIC_Strapi_Org}/uploads/${fileName}`,
                 // responseType: "blob",
                 responseType: "stream",
                 validateStatus: function (status) {

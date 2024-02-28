@@ -23,7 +23,6 @@ const FileAttached = ({
   fileState: any;
   storePreview: previewStore;
 }) => {
-  console.log("fileState", fileState);
   return (
     <div className="  w-full h-full relative">
       <div

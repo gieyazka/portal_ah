@@ -29,6 +29,7 @@ import {
 } from "@mui/icons-material";
 import { approver, approverList, task } from "@/types/next-auth";
 
+import _ from "lodash";
 import _apiFn from "@/utils/apiFn";
 import dayjs from "dayjs";
 import fn from "@/utils/common";
@@ -159,6 +160,13 @@ const ApproverStep = (props: { task: task }) => {
     if (currentPosition.data == undefined) {
       return <div>No data</div>;
     }
+    // console.log("  task.data.currentApprover", task.data.currentApprover);
+    let newCurrentApprover = task.data.currentApprover;
+
+    if (_.isArray(task.data.currentApprover)) {
+      newCurrentApprover = task.data.currentApprover[0];
+      newCurrentApprover.name =  task.data.currentApprover.map(d=>`${d.name} `)
+    }
     return (
       <>
         {currentPosition.data !== undefined &&
@@ -167,7 +175,7 @@ const ApproverStep = (props: { task: task }) => {
             {
               currentPosition.data.data.find(
                 (d: any) =>
-                  d.attributes.level === task.data.currentApprover.level
+                  d.attributes.level === newCurrentApprover.level
               ).attributes.position
             }
           </p>
@@ -175,23 +183,23 @@ const ApproverStep = (props: { task: task }) => {
           <>
             <div className=" text-[#818181] font-semibold ">
               <Typography component="p" className=" text-sm ">
-                {task.data.currentApprover.name}
+                {newCurrentApprover.name}
               </Typography>
               <Typography component="p" className=" text-sm ">
                 {" "}
-                {task.data.currentApprover.position}
+                {newCurrentApprover.position}
               </Typography>
               {viewStore.isMd && (
                 <Typography component="p" className=" text-sm ">
                   Department :
                   {fn.checkString(
                     undefined,
-                    task.data.currentApprover.company,
+                    newCurrentApprover.company,
                     " "
                   )}
                   {fn.checkString(
                     undefined,
-                    task.data.currentApprover.department,
+                    newCurrentApprover.department,
                     " : "
                   )}
                 </Typography>
@@ -220,7 +228,7 @@ const ApproverStep = (props: { task: task }) => {
             <div key={`div${i}`}>
               {task.data.currentApprover ? (
                 <>
-                 <p>{curPOs?.attributes?.position}</p>
+                  <p>{curPOs?.attributes?.position}</p>
                   {viewStore.isMd && (
                     <p>
                       {fn.checkString(
@@ -300,6 +308,9 @@ const ApproverStep = (props: { task: task }) => {
                           if (d.action === "Rejected") {
                             labelProps.error = true;
                           }
+              
+
+                          const oldApprover = d['0'] ? {...d['0'],...d} : d
                           return (
                             <Step key={"div" + i}>
                               <StepLabel
@@ -308,7 +319,7 @@ const ApproverStep = (props: { task: task }) => {
                               >
                                 <div className="flex flex-col">
                                   <p>
-                                    <Person /> {d.name}
+                                    <Person /> {oldApprover.name}
                                   </p>
                                   {/* <p>{d.position}</p>
                     

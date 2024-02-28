@@ -47,6 +47,7 @@ export default function EmailPage({ params }: { params: any }) {
   const loadingStore = useLoading();
   const type = params.field;
   const taskID = params.id;
+
   const isApprove = params.value === "true" ? true : false;
   const storePreview = usePreviewStore();
   const snackbarStore = useSnackbarStore();

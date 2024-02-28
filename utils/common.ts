@@ -1,5 +1,5 @@
 import _, { first, isArray } from "lodash";
-import { approver, filterStore, previewStore, task } from "@/types/next-auth";
+import { approver, filterStore, previewStore, requester, task } from "@/types/next-auth";
 import { useEffect, useState } from "react";
 
 import { Session } from 'next-auth';
@@ -38,7 +38,7 @@ const getStrName = (fullname: string) => {
     if (fullname === undefined) {
         return ""
     }
-    let nameParts = fullname.replace(". ", ".").replace("  ", " ").split(".");
+    let nameParts = fullname.replace(". ", ".").replace(/\s+/g, " ").split(".");
     if (nameParts.length > 1) {
         nameParts = nameParts[1].split(" ")
     } else {
@@ -46,7 +46,7 @@ const getStrName = (fullname: string) => {
     }
     let firstName = nameParts[0];
     let lastName = nameParts[1];
-    let firstCharacter = firstName[0] + lastName[0];
+    let firstCharacter = ` ${firstName ? firstName[0] : ""}${lastName ? lastName[0] : ""}`;
     return firstCharacter
 }
 
@@ -122,7 +122,6 @@ const getNextApprover = (task: { [key: string]: any } | undefined) => {
     if (task === undefined) {
         return;
     }
-
     const userTask = task.items.find((d: {
         status: string; type: string;
     }) => d.type === "bpmn:UserTask" && d.status === 'wait')
@@ -155,23 +154,22 @@ const getNextApprover = (task: { [key: string]: any } | undefined) => {
 
 
 const renderLeaveData = (leaveData: any) => {
+
     const _leaveData = _.orderBy(leaveData, ["date"], ["asc"]);
-
     const lastIndex = _leaveData.length - 1;
-
     if (_leaveData.length > 1) {
         if (
             dayjs(_leaveData[0].date).isSame(
-                dayjs(_leaveData[lastIndex].date),
+                dayjs(_leaveData[lastIndex].dateStr, "YYYYMMDD"),
                 "month"
             )
         ) {
-            return `${dayjs(_leaveData[0].date).format("DD")}-${dayjs(
-                _leaveData[lastIndex].date
-            ).format("DD")}/${dayjs(_leaveData[0].date).format("MM/YYYY")}`;
+            return `${dayjs(_leaveData[0].dateStr, "YYYYMMDD").format("DD")}-${dayjs(
+                _leaveData[lastIndex].dateStr, "YYYYMMDD"
+            ).format("DD")}/${dayjs(_leaveData[0].dateStr, "YYYYMMDD").format("MM/YYYY")}`;
         } else {
-            return `${dayjs(_leaveData[0].date).format("DD/MM/YYYY")}-${dayjs(
-                _leaveData[lastIndex].date
+            return `${dayjs(_leaveData[0].dateStr, "YYYYMMDD").format("DD/MM/YYYY")}-${dayjs(
+                _leaveData[lastIndex].dateStr, "YYYYMMDD"
             ).format("DD/MM/YYYY")}`;
         }
     } else {
@@ -223,11 +221,15 @@ const checkCanAction = (userSession: Session, task: task) => {
     if (userSession !== undefined && task !== undefined) {
         const user = userSession.user
         const currentApprover = task.data.currentApprover
+        const matchFields = ['company', 'department', 'level'];
+
+        if (_.isArray(currentApprover)) {
+            const matches = matchFields.every((field: string) => currentApprover.some(d => d[field] === user[field]) && user.level !== null) || currentApprover.some(d => d.email?.toLowerCase() === user.email?.toLowerCase())
+            return matches;
+        }
         if (currentApprover == null) {
             return false
         }
-        console.log('', currentApprover)
-        const matchFields = ['company', 'department', 'level'];
         //@ts-ignore
         const matches = matchFields.every((field: string) => currentApprover[field] === user[field] && user.level !== null) || user.email?.toLowerCase() === currentApprover.email?.toLowerCase()
         return matches;
@@ -253,10 +255,13 @@ const handleFilter = (data: task[], filterStore: filterStore) => {
                 .includes((filter as string).toUpperCase()) ||
             d.data?.requester?.empid
                 ?.toUpperCase()
+                .includes((filter as string).toUpperCase()) ||
+            d?.task_id
+                ?.toUpperCase()
                 .includes((filter as string).toUpperCase())
         );
     });
-    console.log("filterData", filterData);
+    // console.log("filterData", filterData);
     return filterData;
 };
 const getBase64 = (file: Blob) =>
@@ -320,7 +325,6 @@ const cleanStrapiResponse = (data: [] | {}) => {
             // console.log(element);
             let newObj = { ...element, ...element.attributes }
             delete newObj.attributes
-            console.log(newObj);
         }
     }
 }
@@ -352,10 +356,11 @@ function findNestedArrayWithKey(arr: {}, key: string) {
 }
 
 const onPreviewFile = async (file: string | Blob, type: string, storePreview: previewStore) => {
+
     if (type === "pdf") {
         if (typeof file === "string") {
 
-            const res = await axios.get(`/api/orgchart${file}`, {
+            const res = await axios.get(`${process.env.NEXT_PUBLIC_Strapi_Org_Media}${file}`, {
                 responseType: "blob",
             });
             const pdfBlob = new Blob([res.data], {
@@ -368,9 +373,8 @@ const onPreviewFile = async (file: string | Blob, type: string, storePreview: pr
     }
 
     if (type === "image") {
-        console.log('389', file)
         storePreview.onShowBackDrop(
-            typeof file === "string" ? `${process.env.NEXT_PUBLIC_Strapi}${file}` : URL.createObjectURL(file),
+            typeof file === "string" ? `${process.env.NEXT_PUBLIC_Strapi_Org_Media}${file}` : URL.createObjectURL(file),
             "image"
         );
     }
@@ -397,7 +401,9 @@ const checkNeedFileLeave = (task: any) => {
         dataLeaveType === "maternity" ||
         dataLeaveType === "ordination" ||
         dataLeaveType === "militaryService" ||
+        dataLeaveType === "personalFuneral" ||
         dataLeaveType === "annualSpecial" ||
+        dataLeaveType === "personalWedding" ||
         dataLeaveType === "personalSpecial"
     ) {
         return task.data.filesURL === null || task.data.filesURL.length === 0;
@@ -406,16 +412,77 @@ const checkNeedFileLeave = (task: any) => {
     return false;
 };
 
+const capitalizeFirstLetter = (inputString: string | undefined) => {
+    if (inputString === undefined) {
+        return ""
+    }
+    return inputString.charAt(0).toUpperCase() + inputString.slice(1);
+};
+
+
 const getDiffDate = (date: string) => {
     const getDate = dayjs(date, "YYYY-MM-DD")
     const yearDiff = dayjs().diff(getDate, "y")
     const monthsDiff = dayjs().diff(getDate, 'M') % 12;
-    console.log('monthsDiff', dayjs().diff(getDate, 'M'), monthsDiff)
+    // console.log('monthsDiff', dayjs().diff(getDate, 'M'), monthsDiff)
     return `${yearDiff} years ${monthsDiff == 0 ? "" : monthsDiff + " months"} `
 }
+
+
+const colorStatus = (value: String) => {
+    let style = {
+        backgroundColor: "#a7e5a6",
+        color: "#0C0D17",
+        message: value
+    };
+    switch (value) {
+        case "Waiting":
+            style.backgroundColor = "#1976D2";
+            style.color = "#fff";
+            style.message = "In Process";
+            break;
+        case "Rejected":
+            style.backgroundColor = "#EB4242";
+            style.color = "#fff";
+            style.message = value;
+            break;
+        case "Cancel":
+            style.backgroundColor = "#ededed";
+            style.color = "#0C0D17";
+            style.message = value;
+            break;
+        case "hrCancel":
+            style.backgroundColor = "#f39b19";
+            style.color = "#fff";
+            style.message = "HR Cancel";
+            break;
+        default:
+            break;
+    }
+    return style
+}
+
+const genRequester = (userPayroll: { start_date: string; sub_section?: "" | undefined; branch: string; name_en: string; department: string; position_th: string; }) => {
+    const { start_date, sub_section = "", branch, name_en, department, position_th } = userPayroll || {}
+    return {
+        startDate: start_date,
+        sub_section,
+        departmentPayroll: department,
+        companyPayroll: branch,
+        name: name_en,
+        position: position_th,
+
+    }
+}
+
+
 const fn = {
+    genRequester,
+    capitalizeFirstLetter, colorStatus,
     renderLeaveData, getDiffDate, checkNeedFileLeave,
     callToast, onPreviewFile, objectToQueryString, handleFilter, getStrName, varString, getNextApprover, isImageFile, checkString, useWidth, checkCanAction, getBase64, deleteImage, removeAttrFromStrapi
 }
+
+
 
 export default fn

@@ -43,15 +43,22 @@ function SimpleDialog(props: SimpleDialogProps) {
   }, [data]);
 
   const onClickSearch = async (empID: string, index: number) => {
-    const res = await axios({
-      url: `/api/orgchart/users/getLdapByempID`,
+    const hrOrg = await axios({
+      url: `/api/orgchart/users/getUserByEmpId`,
       method: "POST",
       data: { empid: empID },
     });
 
-    if (res.data.status === true) {
-      setValue(`email.${index}`, res.data.employee.email);
-      setValue(`name.${index}`, res.data.employee.name);
+    if (hrOrg.data.status === true) {
+      setValue(`email.${index}`, hrOrg.data.employee.email);
+      setValue(
+        `name.${index}`,
+        hrOrg.data.employee.prefix +
+          "." +
+          hrOrg.data.employee.firstName +
+          " " +
+          hrOrg.data.employee.lastName
+      );
     } else {
       Swal.fire({
         icon: "error",
@@ -61,7 +68,6 @@ function SimpleDialog(props: SimpleDialogProps) {
       });
     }
   };
-console.log('hrSetting',hrSetting)
   const onSaveHrSetting = async () => {
     Swal.fire({
       title: `Confirm update setting for ${data.company} `,
@@ -105,7 +111,6 @@ console.log('hrSetting',hrSetting)
           data: { id: data._id, responsible },
         });
         if (res.status === 200) {
-          console.log("res.data", res.data);
           if (res.data.acknowledged === true) {
             hrSetting.mutate();
             Swal.fire({

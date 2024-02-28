@@ -31,7 +31,7 @@ const handler = (async (req, res) => {
         send_formData.append(`files`, req.file.buffer, req.file.originalname);
         const resData = await axios({
             method: "POST",
-            url: `${process.env.NEXT_PUBLIC_Strapi}/api/upload`,
+            url: `${process.env.NEXT_PUBLIC_Strapi_Org}/upload`,
             data: send_formData,
             headers: { "Content-Type": "multipart/form-data" },
             validateStatus: function (status) {

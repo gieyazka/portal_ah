@@ -321,7 +321,8 @@ const RenderExportTable = ({
           <p>Row per page : &nbsp; </p>
           <span>
             <select
-              defaultValue={10}
+                        defaultValue={tableFooter.rowPerpage}
+
               onChange={(e) => {
                 setTableFooter((prev: tableFooter) => {
                   return {

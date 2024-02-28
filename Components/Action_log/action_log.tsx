@@ -16,8 +16,8 @@ import {
 import { approverList, previewStore } from "@/types/next-auth";
 import { usePreviewStore, useViewStore } from "@/store/store";
 
+import ActionLogData from "./action_log_data";
 import DownloadIcon from "@mui/icons-material/Download";
-import FilePreview from "./filePreview";
 import { FolderCross } from "iconsax-react";
 import FolderOffOutlinedIcon from "@mui/icons-material/FolderOffOutlined";
 import Image from "next/image";
@@ -30,14 +30,20 @@ import fn from "@/utils/common";
 const Action_log = ({
   actionLog,
   storePreview,
-  // fileState,
-}: {
+}: // fileState,
+{
   actionLog: approverList[] | undefined;
   storePreview: previewStore;
   // fileState: any;
 }) => {
   // console.log(actionLog);
   const viewStore = useViewStore();
+
+  
+
+
+
+
   if (actionLog === undefined) {
     return <></>;
   }
@@ -70,7 +76,7 @@ const Action_log = ({
               }
             }
           >
-            <div className="flex gap-1 flex-col justify-center mx-4 ">
+            <div className="flex gap-1 flex-col justify-center mx-4  ">
               <div className="flex flex-1 text-[#1D366D] justify-between ">
                 <Typography
                   className=" text-xl font-semibold w-[10%]"
@@ -97,25 +103,28 @@ const Action_log = ({
                   Action date
                 </Typography>
                 <Typography
-                  className="text-xl font-semibold flex-1"
+                  className="text-xl font-semibold w-[24%]  "
                   component="p"
                 >
                   Note
                 </Typography>
                 <Typography
-                  className="text-xl font-semibold flex-1"
+                  className="text-xl font-semibold w-[20%]"
                   component="p"
                 >
                   File
                 </Typography>
               </div>
+        
               {actionLog.map((approverData: approverList, index: number) => {
-            
                 // console.log("approverData", approverData);
+                const oldApprover = approverData["0"]
+                  ? { ...approverData["0"], ...approverData }
+                  : approverData;
                 return (
-                  <FilePreview
+                  <ActionLogData
                     key={`action_${index}`}
-                    approverData={approverData}
+                    approverData={oldApprover}
                     index={index}
                   />
                 );

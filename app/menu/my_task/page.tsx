@@ -7,8 +7,8 @@ import { menuItem, subMenu } from "@/types/next-auth";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import React from "react";
-import SubComponent from "./my_request";
-import menuData from "../menuItem";
+import SubComponent from "../../../Components/myTask/my_request";
+import menuData from "../../../Components/menuItem";
 import { useViewStore } from "@/store/store";
 
 export const dynamic = "force-dynamic";
@@ -44,7 +44,6 @@ export default function MyTask(props: { searchParams: { current: string } }) {
       setCurrentSubPath(searchParams.get("current"));
     }
   }, [searchParams.get("current")]);
-  console.log('46',47)
   return (
     // <div className=" p-1 bg-white rounded-xl">
     <div className="h-full w-full">

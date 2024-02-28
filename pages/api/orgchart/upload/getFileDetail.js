@@ -23,7 +23,7 @@ const handler = (async (req, res) => {
     }
     if (req.method === 'GET') {
         const newQuery = fn.objectToQueryString(req.query)
-        const resTask = await axios.get(`${process.env.NEXT_PUBLIC_Strapi}/api/upload/files?${newQuery}`)
+        const resTask = await axios.get(`${process.env.NEXT_PUBLIC_Strapi_Org}/upload/files?${newQuery}`)
         return res.status(resTask.status).json(resTask.data)
         // return res.status(404).json({ error: "test" })
     }

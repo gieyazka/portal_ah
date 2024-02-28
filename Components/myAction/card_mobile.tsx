@@ -31,7 +31,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import FilterListIcon from "@mui/icons-material/FilterList";
-import MenuData from "./../menuItem";
+import MenuData from "../menuItem";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { SWRResponse } from "swr";
 import ShareIcon from "@mui/icons-material/Share";
@@ -93,10 +93,9 @@ export default function Card_Mobile({
     value: item,
   }));
 
-
   return (
-    <div className="h-full w-full flex flex-col bg-[#EEF1F8]">
-      <div className="px-5">
+    <div className="h-full w-full flex flex-col bg-[#EEF1F8] ">
+      <div className="px-5 ">
         <div className="pt-4">
           <Typography
             className="text-[#818181] text-lg font-bold"
@@ -118,9 +117,6 @@ export default function Card_Mobile({
           </Typography>
         </div>
         <div className=" flex items-center justify-between gap-4 ">
-          {/* <div className="ml-4 whitespace-nowrap">
-          <p>{data ? handleFilter(data).length : 0} รายการ</p>
-        </div> */}
           <div className="flex flex-1 justify-between gap-2 items-end mt-2  ">
             <input
               value={filterStore.filterStr}
@@ -167,19 +163,29 @@ export default function Card_Mobile({
               let colorStatus = "#1D336D";
               if (task.data.status === "Rejected") {
                 colorStatus = "#FF5555";
+              } else if (task.data.status === "Success") {
+                colorStatus = "#86dc89";
+              } else if (task.data.status === "Waiting") {
+                colorStatus = "#FDBC3F";
               }
               let action_item = headerTable.find(
                 (header) => header.field === "Action"
               );
               return (
                 <div
-                  className="mt-4 flex shrink-0 bg-white gap-4 items-center h-[102px] justify-between relative"
+                  className="mt-4 flex shrink-0 bg-white gap-4 items-center  justify-between relative"
                   key={task["task_id"]}
                   style={{
                     borderRadius: "5px",
                     boxShadow: "4px 4px 10px 0px rgba(0, 0, 0, 0.15)",
                   }}
                 >
+                  <div
+                    style={{
+                      background: colorStatus,
+                    }}
+                    className={`w-6  absolute h-full`}
+                  ></div>
                   <div className="flex items-center gap-3">
                     <Avatar
                       className="ml-4"
@@ -210,8 +216,9 @@ export default function Card_Mobile({
                       </Typography>
                       <Typography component="p" className="text-[#818181]">
                         {task.data.requester.company},
-                        {task.data.requester.department},
-                        {task.data.requester.section}
+                        {task.data.requester.department}
+                        {task.data.requester.section &&
+                          "," + task.data.requester.section}
                       </Typography>
                     </div>
                   </div>
@@ -225,7 +232,7 @@ export default function Card_Mobile({
                   </div>
                 </div>
               );
-            })}
+            })}{" "}
       </div>
     </div>
   );

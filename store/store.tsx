@@ -1,12 +1,4 @@
-import {
-  DialogStore,
-  actionDialogStore,
-  filterStore,
-  loadingStore,
-  previewStore,
-  snackbarStore,
-  viewStore,
-} from "@/types/next-auth";
+import { DialogStore, actionDialogStore, filterStore, loadingStore, previewStore, snackbarStore, viewStore } from "@/types/next-auth";
 import dayjs, { Dayjs } from "dayjs";
 
 import { SWRResponse } from "swr";
@@ -42,11 +34,7 @@ const useDialogStore = create<DialogStore>(
           task: props.task,
         };
       }),
-    onOpenDialog: (props: {
-      task: any;
-      type?: string | undefined;
-      swrResponse?: SWRResponse | undefined;
-    }) =>
+    onOpenDialog: (props: { task: any; type?: string | undefined; swrResponse?: SWRResponse | undefined }) =>
       set((state: any) => {
         return {
           open: true,
@@ -65,18 +53,15 @@ const useDialogStore = create<DialogStore>(
 );
 const useActionDialogStore = create<actionDialogStore>(
   zukeeper((set: any) => ({
+    email: undefined,
     open: false,
     task: undefined,
     type: undefined,
     swrResponse: undefined,
     action: undefined,
-    onOpenDialog: (props: {
-      task: any;
-      type?: string | undefined;
-      action: boolean;
-      swrResponse?: SWRResponse | undefined;
-    }) =>
+    onOpenDialog: (props: { email: string | undefined; task: any; type?: string | undefined; action: boolean; swrResponse?: SWRResponse | undefined }) =>
       set((state: any) => ({
+        email: props.email,
         open: true,
         task: props.task,
         type: props.type,
@@ -85,10 +70,11 @@ const useActionDialogStore = create<actionDialogStore>(
       })),
     onCloseDialog: () =>
       set((state: any) => ({
+        email: undefined,
         open: false,
         task: undefined,
         type: undefined,
-        swrResponse: undefined,
+        // swrResponse: undefined,
         action: undefined,
       })),
   }))
@@ -146,6 +132,10 @@ const useFilterStore = create<filterStore>((set) => ({
     set((state: filterStore) => ({
       filterDoc: str,
     })),
+  handleChangePage: () =>
+    set((state: filterStore) => ({
+      filterDoc: undefined,
+    })),
   searchClick: () =>
     set((state: filterStore) => {
       if (state.endDate === null) {
@@ -180,11 +170,7 @@ const useSnackbarStore = create<snackbarStore>(
     type: undefined,
     progress: 100,
     countdown: 5,
-    showSnackBar: (props: {
-      title: string;
-      message?: string;
-      type?: string;
-    }) =>
+    showSnackBar: (props: { title: string; message?: string; type?: string }) =>
       set((state: any) => ({
         open: true,
         title: props.title,
@@ -238,12 +224,4 @@ if (typeof window !== "undefined") {
   window.store = useDialogStore;
 }
 
-export {
-  useFilterStore,
-  useDialogStore,
-  usePreviewStore,
-  useActionDialogStore,
-  useSnackbarStore,
-  useViewStore,
-  useLoading,
-};
+export { useFilterStore, useDialogStore, usePreviewStore, useActionDialogStore, useSnackbarStore, useViewStore, useLoading };

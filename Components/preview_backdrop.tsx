@@ -82,7 +82,6 @@ const Preview_Backdrop = () => {
 const PreviewPDF = ({ file }: { file: any }) => {
   const [numPages, setNumPages] = useState<number>();
   const [pageNumber, setPageNumber] = useState<number>(1);
-  console.log("file", file);
   function onDocumentLoadSuccess({ numPages }: { numPages: number }): void {
     setNumPages(numPages);
   }

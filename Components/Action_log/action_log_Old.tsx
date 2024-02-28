@@ -155,13 +155,13 @@ const Action_log = (props: { actionLog: approverList[] | undefined }) => {
                     isPdf = true;
                     return (
                       <>
-                        {/* {process.env.NEXT_PUBLIC_Strapi}
+                        {/* {process.env.NEXT_PUBLIC_Strapi_Org}
                           {file} */}
                         <div className="relative text-center h-24 w-24">
                           <div
                             onClick={async () => {
                               const res = await axios.get(
-                                `${process.env.NEXT_PUBLIC_Strapi}${file}`,
+                                `${process.env.NEXT_PUBLIC_Strapi_Org}${file}`,
                                 {
                                   responseType: "blob",
                                 }
@@ -186,11 +186,11 @@ const Action_log = (props: { actionLog: approverList[] | undefined }) => {
                         blurDataURL="/assets/image-placeholder.jpg"
                         onClick={() =>
                           storePreview.onShowBackDrop(
-                            `${process.env.NEXT_PUBLIC_Strapi}${file}`,
+                            `${process.env.NEXT_PUBLIC_Strapi_Org}${file}`,
                             "image"
                           )
                         }
-                        src={`${process.env.NEXT_PUBLIC_Strapi}${file}`}
+                        src={`${process.env.NEXT_PUBLIC_Strapi_Org}${file}`}
                         // className='w-full h-full'
                         fill
                         style={{

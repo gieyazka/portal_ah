@@ -12,18 +12,15 @@ function FileAttached(props: { task: task }) {
   const requester = task.data.requester;
   const viewStore = useViewStore();
   const [fileState, setFileState] = React.useState<{}[] | undefined>([]);
-  console.log('fileState',fileState)
   React.useEffect(() => {
     const fetchData = async () => {
       try {
         const newData = await Promise.all(
           task.data?.filesURL?.map(async (d: string) => {
             const response = await _apiFn.getFileInfo(d);
-            console.log('response.data',response)
             return response;
           })
         );
-        console.log('newData',newData)
         setFileState(newData);
       } catch (error) {
         console.error("Error fetching data:", error);

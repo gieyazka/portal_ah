@@ -27,6 +27,8 @@ declare module "next-auth" {
       fullName?: string
       prefix?: string
       position?: string
+      ldapUser?: string
+      userWithoutCompany?: string
     } & DefaultSession["user"]
   }
 }
@@ -86,6 +88,7 @@ type dateFilter = {
 
 type task = {
   [key: string]: any | undefined
+  & { requester: requester }
 }
 
 
@@ -124,11 +127,14 @@ type filterStore = {
   handleChangeFilterDoc: (any) => void;
   searchClick: () => void;
   handleChangePeriod: (period: number) => void;
+  handleChangePage: () => void;
+  
 }
 
 type requester = {
-  startDate: ReactNode;
+  startDate: string;
   sub_section: string;
+  departmentPayroll?: string; companyPayroll?: string,
   company?: string, name?: string, department?: string, section?: string, empid?: string, position?: string
 }
 
@@ -159,12 +165,13 @@ type DialogStore = {
   onReload: (prop: { task: any }) => void;
 }
 type actionDialogStore = {
+  email: string;
   open: boolean;
   task: task | undefined
   action: boolean | undefined;
   type?: string | undefined,
   swrResponse?: SWRResponse | undefined,
-  onOpenDialog: (prop: { task: any, type?: string | undefined, swrResponse?: SWRResponse | undefined, action: boolean }) => void,
+  onOpenDialog: (prop: { task: any, type?: string | undefined, swrResponse?: SWRResponse | undefined, action: boolean, email: string }) => void,
   onCloseDialog: () => void;
   onReload: (prop: { task: any }) => void;
 }

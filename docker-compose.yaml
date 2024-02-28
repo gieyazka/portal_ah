@@ -9,6 +9,11 @@ services:
     image: portal_workflow
     environment:
       - TZ=Asia/Bangkok
+      - NEXT_PUBLIC_Strapi_Org_no_head=agrflow01.aapico.com
+      - NEXT_PUBLIC_Strapi_Org=https://apigw.aapico.com/orgChart
+      - NEXT_PUBLIC_WORKFLOW_URL=https://apigw.aapico.com/workflow
+      - NEXTAUTH_URL=https://ewf.aapico.com/
+      - NEXT_PUBLIC_NEXTAUTH_URL=https://ewf.aapico.com/
     ports:
       - 8088:8080
     restart: unless-stopped

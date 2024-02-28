@@ -7,7 +7,6 @@ export default function handler(
     res: NextApiResponse<any>
 ) {
 
-    console.log('req',req)
     if (req.method !== 'POST') {
         res.status(405).send({ message: 'Only POST requests allowed' })
         return

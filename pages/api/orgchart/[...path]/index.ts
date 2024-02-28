@@ -17,7 +17,7 @@ export default async function handler(
         const { path } = req.query
         const data = req.body
         const joinPath = path?.join('/');
-        const resTask = await axios.post(`${process.env.NEXT_PUBLIC_Strapi}/api/${joinPath}`,
+        const resTask = await axios.post(`${process.env.NEXT_PUBLIC_Strapi_Org}/api/${joinPath}`,
             data
         )
         res.status(resTask.status).json(resTask.data)
@@ -27,11 +27,11 @@ export default async function handler(
         const joinPath = path?.join('/');
         const newQuery = fn.objectToQueryString(query)
         if (newQuery) {
-            const resTask = await axios.get(`${process.env.NEXT_PUBLIC_Strapi}/api/${joinPath}?${newQuery}`)
+            const resTask = await axios.get(`${process.env.NEXT_PUBLIC_Strapi_Org}/api/${joinPath}?${newQuery}`)
             res.status(resTask.status).json(resTask.data)
             return resTask
         }
-        const resTask = await axios.get(`${process.env.NEXT_PUBLIC_Strapi}/api/${joinPath}`)
+        const resTask = await axios.get(`${process.env.NEXT_PUBLIC_Strapi_Org}/api/${joinPath}`)
         res.status(resTask.status).json(resTask.data)
 
     }
